@@ -3332,15 +3332,15 @@ general {
     gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim #$on_primary_fixed_variant $primary_fixed_dim 90deg
-    col.inactive_border = $inverse_primary
+    col.active_border = $inverse_primary #$on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.inactive_border = $background
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
 group:groupbar:col.active =  $primary_fixed_dim
-group:groupbar:col.inactive = $inverse_primary
+group:groupbar:col.inactive = $background
 
 dwindle {
     pseudotile = true
@@ -3492,7 +3492,7 @@ windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
 ##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-windowrule = bordercolor $primary_fixed_dim, floating:1, onworkspace:w[fv1-10] #$on_primary_fixed_variant 90deg
+windowrule = bordercolor $inverse_primary, floating:1, onworkspace:w[fv1-10] #$on_primary_fixed_variant 90deg
 ##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
 ##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
@@ -3835,15 +3835,15 @@ general {
     gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim #$on_primary_fixed_variant $primary_fixed_dim 90deg
-    col.inactive_border = $inverse_primary
+    col.active_border = $inverse_primary #$on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.inactive_border = $background
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
 group:groupbar:col.active =  $primary_fixed_dim
-group:groupbar:col.inactive = $inverse_primary
+group:groupbar:col.inactive = $background
 
 dwindle {
     pseudotile = true
@@ -3995,7 +3995,7 @@ windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
 ##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-windowrule = bordercolor $primary_fixed_dim, floating:1, onworkspace:w[fv1-10] #$on_primary_fixed_variant 90deg
+windowrule = bordercolor $inverse_primary, floating:1, onworkspace:w[fv1-10] #$on_primary_fixed_variant 90deg
 ##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
 ##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
@@ -6211,7 +6211,7 @@ function createCandyUtilsBox() {
                 GLib.spawn_command_line_async(`sed -i 's/BORDER_RADIUS=.*/BORDER_RADIUS=${numValue}/' '${settingsFile}'`);
                 
                 // Update style.css file (from hook script)
-                GLib.spawn_command_line_async(`sed -i 's/border-radius: [0-9]\\+px/border-radius: ${numValue}px/' '${styleFile}'`);
+                GLib.spawn_command_line_async(`sed -i '6s/border-radius: [0-9]\\+px/border-radius: ${numValue}px/' '${styleFile}'`);
                 
                 // Get current icon size for relaunch
                 function getCurrentIconSize() {
@@ -8369,7 +8369,7 @@ function createTogglesBox() {
                 GLib.spawn_command_line_async(`sed -i 's/BORDER_RADIUS=.*/BORDER_RADIUS=${numValue}/' '${settingsFile}'`);
                 
                 // Update style.css file (from hook script)
-                GLib.spawn_command_line_async(`sed -i 's/border-radius: [0-9]\\+px/border-radius: ${numValue}px/' '${styleFile}'`);
+                GLib.spawn_command_line_async(`sed -i '6s/border-radius: [0-9]\\+px/border-radius: ${numValue}px/' '${styleFile}'`);
                 
                 // Get current icon size for relaunch
                 function getCurrentIconSize() {
