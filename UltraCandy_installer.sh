@@ -7812,7 +7812,7 @@ function createTogglesBox() {
         }
         saveWaybarState(waybarIslandsEnabled);
     });
-    presetBox.append(waybarToggleBtn);
+    //presetBox.append(waybarToggleBtn);
     
     // Add 'New Start Icon' button before Dock presets
     const newStartIconBtn = new Gtk.Button({ label: 'New Start Icon' });
@@ -7959,7 +7959,7 @@ function createTogglesBox() {
     // Set initial button states
     updateMatugenButtonStates();
     
-    mainRow.append(themeBox);
+    //mainRow.append(themeBox);
     
     // Right: All toggles
     const rightBox = new Gtk.Box({
