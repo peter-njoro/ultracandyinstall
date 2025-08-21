@@ -3408,6 +3408,9 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+windowrule = move 73% 50,class:(Candy.SystemMonitor)
+windowrule = move 32% 50,class:(Candy.Media)
+windowrule = move 1% 50,class:(Candy.Weather)
 windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
 windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
@@ -3911,6 +3914,9 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+windowrule = move 73% 50,class:(Candy.SystemMonitor)
+windowrule = move 32% 50,class:(Candy.Media)
+windowrule = move 1% 50,class:(Candy.Weather)
 windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
 windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
