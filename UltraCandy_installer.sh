@@ -2163,8 +2163,8 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
         fi
     else
         # Fallback if colors.css doesn't exist
-        "$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
-        echo "🎨 Colors file not found, launched dock anyway"
+        #"$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
+        echo "🎨 Colors file not found"
     fi
 fi
 
@@ -2253,8 +2253,8 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
         fi
     else
         # Fallback if colors.css doesn't exist
-        "$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
-        echo "🎨 Colors file not found, launched dock anyway"
+        #"$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
+        echo "🎨 Colors file not found"
     fi
 fi
 
