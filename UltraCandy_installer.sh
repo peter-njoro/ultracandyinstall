@@ -285,6 +285,7 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
+        "power-profiles-daemon"
         "bluez"
         "bluez-utils"
         "blueman"
