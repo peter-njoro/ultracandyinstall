@@ -903,28 +903,6 @@ EOF
     
 # Function to automatically setup Hyprcandy configuration
 setup_ultracandy() {
-    
-    if [ "$PANEL_CHOICE" = "waybar" ]; then
-        if [ -d "$HOME/mechabar" ]; then
-            echo "🔄 Installing Waybar..."
-            rm -rf "$HOME/mechabar"
-            sleep 0.5
-            git clone https://github.com/sejjy/mechabar.git
-            cd mechabar
-            ./install.sh
-            cd ..
-            rm -rf mechabar
-            echo "✅ Waybar installed successfully!"
-        else
-            echo "🔄 Installing Waybar..."
-            git clone https://github.com/sejjy/mechabar.git
-            cd mechabar
-            ./install.sh
-            cd ..
-            rm -rf mechabar
-            echo "✅ Waybar installed successfully!"
-        fi
-    fi
 
     print_status "Setting up UltraCandy configuration..."
     
