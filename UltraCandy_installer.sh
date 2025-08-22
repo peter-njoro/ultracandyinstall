@@ -1319,7 +1319,7 @@ NEW_RADIUS=$((BORDER_RADIUS + 2))
 sed -i "s/BORDER_RADIUS=.*/BORDER_RADIUS=$NEW_RADIUS/" "$SETTINGS_FILE"
 
 # Update style.css file
-sed -i "s/border-radius: [0-9]\+px/border-radius: ${NEW_RADIUS}px/" "$STYLE_FILE"
+sed -i "5s/border-radius: [0-9]\+px/border-radius: ${NEW_RADIUS}px/" "$STYLE_FILE"
 
 # Reload dock to apply CSS changes
 if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
@@ -1373,7 +1373,7 @@ NEW_RADIUS=$((BORDER_RADIUS > 0 ? BORDER_RADIUS - 2 : 0))
 sed -i "s/BORDER_RADIUS=.*/BORDER_RADIUS=$NEW_RADIUS/" "$SETTINGS_FILE"
 
 # Update style.css file
-sed -i "s/border-radius: [0-9]\+px/border-radius: ${NEW_RADIUS}px/" "$STYLE_FILE"
+sed -i "5s/border-radius: [0-9]\+px/border-radius: ${NEW_RADIUS}px/" "$STYLE_FILE"
 
 # Reload dock to apply CSS changes
 if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
@@ -1526,12 +1526,12 @@ case "$1" in
         BORDER_WIDTH=1
         ;;
     "balanced")
-        ICON_SIZE=28
-        BORDER_RADIUS=16
+        ICON_SIZE=30
+        BORDER_RADIUS=20
         BORDER_WIDTH=2
         ;;
     "prominent")
-        ICON_SIZE=36
+        ICON_SIZE=40
         BORDER_RADIUS=20
         BORDER_WIDTH=3
         ;;
@@ -1561,7 +1561,7 @@ sed -i "s/-i [0-9]\+/-i $ICON_SIZE/g" "$LAUNCH_SCRIPT"
 sed -i "s/-i [0-9]\+/-i $ICON_SIZE/g" "$KEYBINDS_FILE"
 
 # Update style.css file
-sed -i "s/border-radius: [0-9]\+px/border-radius: ${BORDER_RADIUS}px/" "$STYLE_FILE"
+sed -i "5s/border-radius: [0-9]\+px/border-radius: ${BORDER_RADIUS}px/" "$STYLE_FILE"
 sed -i "s/border-width: [0-9]\+px/border-width: ${BORDER_WIDTH}px/" "$STYLE_FILE"
 
 # Restart dock with current position detection
@@ -6218,7 +6218,7 @@ function createCandyUtilsBox() {
                 GLib.spawn_command_line_async(`sed -i 's/BORDER_RADIUS=.*/BORDER_RADIUS=${numValue}/' '${settingsFile}'`);
                 
                 // Update style.css file (from hook script)
-                GLib.spawn_command_line_async(`sed -i '6s/border-radius: [0-9]\\+px/border-radius: ${numValue}px/' '${styleFile}'`);
+                GLib.spawn_command_line_async(`sed -i '5s/border-radius: [0-9]\\+px/border-radius: ${numValue}px/' '${styleFile}'`);
                 
                 // Get current icon size for relaunch
                 function getCurrentIconSize() {
@@ -8376,7 +8376,7 @@ function createTogglesBox() {
                 GLib.spawn_command_line_async(`sed -i 's/BORDER_RADIUS=.*/BORDER_RADIUS=${numValue}/' '${settingsFile}'`);
                 
                 // Update style.css file (from hook script)
-                GLib.spawn_command_line_async(`sed -i '6s/border-radius: [0-9]\\+px/border-radius: ${numValue}px/' '${styleFile}'`);
+                GLib.spawn_command_line_async(`sed -i '5s/border-radius: [0-9]\\+px/border-radius: ${numValue}px/' '${styleFile}'`);
                 
                 // Get current icon size for relaunch
                 function getCurrentIconSize() {
