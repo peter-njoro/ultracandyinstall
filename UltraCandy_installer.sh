@@ -270,6 +270,7 @@ build_package_list() {
         "gnome-control-center"
         "gnome-tweaks"
         "gnome-software"
+        "gnome-calculator"
         "mutter"
 
         # Flatpak base repo for Gnome Software app
@@ -4345,7 +4346,7 @@ bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http://" #Launch your default br
 bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
 bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
-bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
+bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
 
 #### Bar/Panel ####
@@ -4566,7 +4567,7 @@ bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http://" #Launch your default br
 bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
 bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
-bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
+bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
 
 #### Bar/Panel ####
