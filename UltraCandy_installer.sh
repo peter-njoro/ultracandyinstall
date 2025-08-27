@@ -341,9 +341,6 @@ build_package_list() {
         "bc"
         "libnotify"
         "jq"
-
-        # Waybar setup notification daemon and fallback notification daemon when hyprpanel isn't running
-        "mako"
         
         # Fonts and emojis
         "ttf-dejavu-sans-code"
@@ -429,11 +426,13 @@ build_package_list() {
         packages+=(
         "waybar"
         "waypaper"
+        "swaync"
         )
         print_status "Added Waybar to package list"
     else
         packages+=(
         "ags-hyprpanel-git"
+        "mako"
         )
         print_status "Added Hyprpanel to package list"
     fi
