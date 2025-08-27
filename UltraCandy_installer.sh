@@ -964,7 +964,7 @@ setup_ultracandy() {
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
-    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsm wallust waybar waypaper wlogout xsettingsd
+    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi swaync uwsm wallust waybar waypaper wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
@@ -3234,8 +3234,8 @@ exec-once = hash dbus-update-activation-environment 2>/dev/null &
 exec-once = systemctl --user import-environment &
 # Start swww
 exec-once = swww-daemon &
-# Start mako
-exec-once = mako &
+# Start swaync
+exec-once = swaync &
 # Startup
 exec-once = ~/.config/hyprcandy/hooks/startup_services.sh &
 # Start Polkit
