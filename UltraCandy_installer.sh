@@ -2610,10 +2610,16 @@ trigger_wallust() {
         echo "⚠️  Wallust not found"
     fi
 }
+restart_swaync() {
+    pkill -f swaync
+    sleep 0.1
+    swaync &
+}
 execute_color_generation() {
     echo "🚀 Starting color generation for new background..."
     trigger_matugen
     trigger_wallust
+    restart_swaync
     sleep 1
     echo "✅ Color generation processes initiated"
 }
