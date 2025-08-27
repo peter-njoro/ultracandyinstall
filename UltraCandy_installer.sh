@@ -4852,8 +4852,24 @@ update_custom() {
         # Replace bar-0 with waybar in layer rules
         sed -i '18s/exec-once = systemctl --user start hyprpanel/exec-once = waybar \&/g' "$CUSTOM_CONFIG_FILE"
         sed -i '22s/exec-once = systemctl --user start hyprpanel-idle-monitor/exec-once = systemctl --user start waybar-idle-monitor/g' "$CUSTOM_CONFIG_FILE"
-        sed -i 's/#exec-once = swww-daemon &/exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
-        sed -i 's/#exec-once = mako &/exec-once = mako \&/g' "$CUSTOM_CONFIG_FILE"
+        
+        # Handle swaync line - uncomment if commented, or ensure it's uncommented
+        if grep -q "^#.*exec-once = swaync &" "$CUSTOM_CONFIG_FILE"; then
+            # Line is commented, uncomment it
+            sed -i 's/^#\+\s*exec-once = swaync &/exec-once = swaync \&/g' "$CUSTOM_CONFIG_FILE"
+        elif ! grep -q "^exec-once = swaync &" "$CUSTOM_CONFIG_FILE"; then
+            # Line doesn't exist at all, add it (optional - you might want to handle this case)
+            echo "exec-once = swaync &" >> "$CUSTOM_CONFIG_FILE"
+        fi
+        
+        # Handle swww-daemon line - uncomment if commented
+        if grep -q "^#.*exec-once = swww-daemon &" "$CUSTOM_CONFIG_FILE"; then
+            # Line is commented, uncomment it
+            sed -i 's/^#\+\s*exec-once = swww-daemon &/exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
+        elif ! grep -q "^exec-once = swww-daemon &" "$CUSTOM_CONFIG_FILE"; then
+            # Line doesn't exist at all, add it (optional - you might want to handle this case)
+            echo "exec-once = swww-daemon &" >> "$CUSTOM_CONFIG_FILE"
+        fi
         sed -i 's/#exec-once = systemctl --user start waypaper-watcher/exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = blur,bar-0/layerrule = blur,waybar/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = ignorezero,bar-0/layerrule = ignorezero,waybar/g' "$CUSTOM_CONFIG_FILE"
@@ -4862,8 +4878,20 @@ update_custom() {
         # Replace bar-0 with hyprpanel in layer rules
         sed -i '18s/exec-once = waybar \&/exec-once = systemctl --user start hyprpanel/g' "$CUSTOM_CONFIG_FILE"
         sed -i '22s/exec-once = systemctl --user start waybar-idle-monitor/exec-once = systemctl --user start hyprpanel-idle-monitor/g' "$CUSTOM_CONFIG_FILE"
+        
+        # Handle swaync line - comment if uncommented
+        if grep -q "^exec-once = swaync &" "$CUSTOM_CONFIG_FILE"; then
+            # Line is uncommented, comment it
+            sed -i 's/^exec-once = swaync &#exec-once = swaync \&/g' "$CUSTOM_CONFIG_FILE"
+        fi
+        
+        # Handle swww-daemon line - comment if uncommented
+        if grep -q "^exec-once = swww-daemon &" "$CUSTOM_CONFIG_FILE"; then
+            # Line is uncommented, comment it
+            sed -i 's/^exec-once = swww-daemon &#exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
+        fi
+        
         sed -i 's/exec-once = swww-daemon &/#exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
-        sed -i 's/exec-once = mako &/#exec-once = mako \&/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/exec-once = systemctl --user start waypaper-watcher/#exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = blur,waybar/layerrule = blur,bar-0/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = ignorezero,waybar/layerrule = ignorezero,bar-0/g' "$CUSTOM_CONFIG_FILE"
