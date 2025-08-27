@@ -2027,12 +2027,40 @@ update_hypr_cursor_env() {
     sed -i "s|^env = HYPRCURSOR_THEME,.*|env = HYPRCURSOR_THEME,$theme|" "$HYPRCONF"
     sed -i "s|^env = HYPRCURSOR_SIZE,.*|env = HYPRCURSOR_SIZE,$size|" "$HYPRCONF"
 
-    echo "✅ Updated cursor theme and size: $theme / $size"
+    # Apply changes immediately
+    apply_cursor_changes "$theme" "$size"
+
+    echo "✅ Updated and applied cursor theme: $theme / $size"
+}
+
+apply_cursor_changes() {
+    local theme="$1"
+    local size="$2"
+    
+    # Method 1: Reload Hyprland config
+    hyprctl reload 2>/dev/null
+    # Apply cursor changes immediately using hyprctl
+    hyprctl setcursor "$theme" "$size" 2>/dev/null || {
+        echo "⚠️  hyprctl setcursor failed, falling back to reload"
+        hyprctl reload 2>/dev/null
+    }
+    
+    # Method 2: Set cursor for current session (fallback)
+    if command -v gsettings >/dev/null 2>&1; then
+        gsettings set org.gnome.desktop.interface cursor-theme "$theme" 2>/dev/null || true
+        gsettings set org.gnome.desktop.interface cursor-size "$size" 2>/dev/null || true
+    fi
+    
+    # Method 3: Update X11 cursor (if running under Xwayland apps)
+    if [ -n "$DISPLAY" ]; then
+        echo "Xcursor.theme: $theme" | xrdb -merge 2>/dev/null || true
+        echo "Xcursor.size: $size" | xrdb -merge 2>/dev/null || true
+    fi
 }
 
 watch_gtk_file() {
     local file="$1"
-    echo "🔍 Watching $file for cursor changes..."
+    echo "👁 Watching $file for cursor changes..."
     inotifywait -m -e modify "$file" | while read -r; do
         theme=$(extract_cursor_theme "$file")
         size=$(extract_cursor_size "$file")
@@ -3273,6 +3301,7 @@ env = ELECTRON_OZONE_PLATFORM_HINT,wayland
 env = WINIT_UNIX_BACKEND,wayland
 env = GTK_THEME,adw-gtk3-dark
 env = WLR_DRM_NO_ATOMIC,1
+env = WLR_NO_HARDWARE_CURSORS,1
 # Virtual machine display scaling
 env = QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough
 # For better VM performance
@@ -3779,6 +3808,7 @@ env = ELECTRON_OZONE_PLATFORM_HINT,wayland
 env = WINIT_UNIX_BACKEND,wayland
 env = GTK_THEME,adw-gtk3-dark
 env = WLR_DRM_NO_ATOMIC,1
+env = WLR_NO_HARDWARE_CURSORS,1
 # Virtual machine display scaling
 env = QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough
 # For better VM performance
