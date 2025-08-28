@@ -388,6 +388,10 @@ build_package_list() {
         
         # Configuration management
         "stow"
+
+        #Extra
+        "spotify"
+        "equibop-bin"
     )
     
     # Add display manager specific packages
