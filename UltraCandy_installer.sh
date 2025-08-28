@@ -514,7 +514,13 @@ install_packages() {
         print_status "You can try installing failed packages manually:"
         echo "$AUR_HELPER -S ${failed[*]}"
     fi
-    
+
+    # Prevent notification daemon conflicts
+    if [ "$PANEL_CHOICE" = "waybar" ]; then
+        $AUR_HELPER -R mako
+    else
+        $AUR_HELPER -R swaync
+    fi
         # Installed seperately without "--no-confirm" incase of conflicting "rofi" package
     $AUR_HELPER -S rofi-lbonn-wayland-git
 }
