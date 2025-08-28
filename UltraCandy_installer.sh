@@ -1911,6 +1911,69 @@ EOF
 chmod +x "$HOME/.config/swaync/recorder.sh"
 
 # ═══════════════════════════════════════════════════════════════
+#                           GJS SCRIPTS
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.ultracandy/GJS/toggle-control-center.sh" << 'EOF'
+#!/bin/bash
+
+# Check if the process is running
+if pgrep -f "candy-main.js" > /dev/null; then
+    # If running, kill it
+    killall gjs ~/.ultracandy/GJS/candy-main.js
+else
+    # If not running, start it
+    gjs ~/.ultracandy/GJS/candy-main.js &
+fi
+EOF
+
+cat > "$HOME/.ultracandy/GJS/toggle-media-player.sh" << 'EOF'
+#!/bin/bash
+
+# Check if the process is running
+if pgrep -f "media-main.js" > /dev/null; then
+    # If running, kill it
+    killall gjs ~/.ultracandy/GJS/media-main.js
+else
+    # If not running, start it
+    gjs ~/.ultracandy/GJS/media-main.js &
+fi
+EOF
+
+cat > "$HOME/.ultracandy/GJS/toggle-system-monitor.sh" << 'EOF'
+#!/bin/bash
+
+# Check if the process is running
+if pgrep -f "candy-system-monitor.js" > /dev/null; then
+    # If running, kill it
+    killall gjs ~/.ultracandy/GJS/candy-system-monitor.js
+else
+    # If not running, start it
+    gjs ~/.ultracandy/GJS/candy-system-monitor.js &
+fi
+EOF
+
+cat > "$HOME/.ultracandy/GJS/toggle-weather-widget.sh" << 'EOF'
+#!/bin/bash
+
+# Check if the process is running
+if pgrep -f "weather-main.js" > /dev/null; then
+    # If running, kill it
+    killall gjs ~/.ultracandy/GJS/weather-main.js
+else
+    # If not running, start it
+    gjs ~/.ultracandy/GJS/weather-main.js &
+fi
+EOF
+
+chmod +x "$HOME/.ultracandy/GJS/toggle-control-center.sh"
+chmod +x "$HOME/.ultracandy/GJS/toggle-media-player.sh"
+chmod +x "$HOME/.ultracandy/GJS/toggle-system-monitor.sh"
+chmod +x "$HOME/.ultracandy/GJS/toggle-weather-widget.sh"
+
+echo "✅ Widget toggle scripts made executable!"
+
+# ═══════════════════════════════════════════════════════════════
 #                 SERVICES BASED ON CHOSEN BAR
 # ═══════════════════════════════════════════════════════════════
 if [ "$PANEL_CHOICE" = "waybar" ]; then
