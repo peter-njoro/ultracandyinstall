@@ -297,6 +297,7 @@ build_package_list() {
         "pacman-contrib"
 
         # Application launchers and menus
+        "rofi-wayland"
         "rofi-emoji"
         "rofi-nerdy"
         
@@ -515,14 +516,13 @@ install_packages() {
         echo "$AUR_HELPER -S ${failed[*]}"
     fi
     
-        # Installed seperately without "--no-confirm" incase of conflicting "rofi" package
-    $AUR_HELPER -S rofi-lbonn-wayland-git
-
     # Prevent notification daemon conflicts
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         $AUR_HELPER -R mako
+        print_status "SwayNC notification daemon set instead of mako since you chose waybar"
     else
         $AUR_HELPER -R swaync
+        print_status "Mako set as fallback notificaion daemon over swaync for when hyprpanel is toggled off"
     fi
 }
 
