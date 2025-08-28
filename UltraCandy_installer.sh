@@ -293,7 +293,7 @@ build_package_list() {
         "nwg-displays"
         "nwg-dock-hyprland"
         "wlogout"
-        "uwsm-git"
+        "uwsm"
         "pacman-contrib"
 
         # Application launchers and menus
