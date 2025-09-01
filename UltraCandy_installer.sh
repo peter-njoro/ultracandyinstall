@@ -4423,7 +4423,7 @@ label {
 
 image {
     monitor =
-    path = ~/.config/background.png #.face.icon
+    path = ~/.config/lock.png #.face.icon
     size = 160  lesser side if not 1:1 ratio
     rounding = -1 # negative values mean circle
     border_size = 4
