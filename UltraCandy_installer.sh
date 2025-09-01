@@ -2276,6 +2276,12 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sleep 1
 fi
 
+# Create lock.png at 661x661 pixels
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    magick "$HOME/.config/background[0]" -resize 661x661^ -gravity center -extent 661x661 "$HOME/.config/lock.png"
+    echo "🔒 Created lock.png at 661x661 pixels"
+fi
+
 # Update mako config colors from nwg-dock-hyprland/colors.css
 MAKO_CONFIG="$HOME/.config/mako/config"
 COLORS_CSS="$HOME/.config/nwg-dock-hyprland/colors.css"
