@@ -386,6 +386,7 @@ build_package_list() {
         "cmatrix"
         "pipes.sh"
         "asciiquarium"
+        "tty-clock"
         
         # Configuration management
         "stow"
@@ -710,6 +711,7 @@ alias weather="curl wttr.in"
 # Fun stuff
 alias matrix="cmatrix -a -b -r"
 alias pipes="pipes.sh"
+alias clock="tty-clock"
 alias sea="asciiquarium"
 
 # Start UltraCandy fastfetch
@@ -896,6 +898,7 @@ alias weather="curl wttr.in"
 # Fun stuff
 alias matrix="cmatrix -a -b -r"
 alias pipes="pipes.sh"
+alias clock="tty-clock"
 alias sea="asciiquarium"
 
 # Start UltraCandy fastfetch
