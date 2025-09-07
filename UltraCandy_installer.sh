@@ -7340,7 +7340,7 @@ function createCandyUtilsBox() {
         lbl.set_size_request(110, -1);
         
         const entry = new Gtk.Entry({ 
-            placeholder_text: '0-105',
+            placeholder_text: '0-180',
             width_chars: 8,
             halign: Gtk.Align.CENTER
         });
@@ -7363,8 +7363,8 @@ function createCandyUtilsBox() {
             
             try {
                 let numValue = parseFloat(value);
-                if (isNaN(numValue) || numValue < 0 || numValue > 105) {
-                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-105" -t 2000`);
+                if (isNaN(numValue) || numValue < 0 || numValue > 180) {
+                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-180" -t 2000`);
                     return;
                 }
                 
@@ -7462,7 +7462,7 @@ function createCandyUtilsBox() {
 
 var exports = {
     createCandyUtilsBox
-};   
+}; 
 EOF
 
 else
