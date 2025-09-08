@@ -7451,7 +7451,68 @@ function createCandyUtilsBox() {
         row.append(entry);
         rightTogglesBox.append(row);
     }
+
+    // --- Waybar Outer Radius Control ---
+    function addWaybarOuterRadiusRow(label) {
+        const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+        const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+        lbl.set_size_request(110, -1);
+        
+        const entry = new Gtk.Entry({ 
+            placeholder_text: '0-20',
+            width_chars: 8,
+            halign: Gtk.Align.CENTER
+        });
+        
+        // Load current value
+        const waybarOuterRadiusStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar_outer_radius.state']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(waybarOuterRadiusStateFile);
+            if (ok && contents) {
+                let value = imports.byteArray.toString(contents).trim();
+                entry.set_text(value);
+            }
+        } catch (e) {
+            // Use default value from CSS if state file doesn't exist
+            entry.set_text('20.0');
+        }
+        
+        function updateWaybarOuterRadius(value) {
+            const waybarStyleFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
+            
+            try {
+                let numValue = parseFloat(value);
+                if (isNaN(numValue) || numValue < 0 || numValue > 20) {
+                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-20" -t 2000`);
+                    return;
+                }
+                
+                let valueStr = numValue.toFixed(1);
+                
+                // Update CSS file - border-radius
+                GLib.spawn_command_line_async(`sed -i '30s/border-radius: [0-9.]*px;/border-radius: ${valueStr}px;/' '${waybarStyleFile}'`);
+                GLib.spawn_command_line_async(`sed -i '19s/border-radius: [0-9.]*px;/border-radius: ${valueStr}px;/' '${waybarStyleFile}'`);
+                
+                // Update state file
+                GLib.file_set_contents(waybarOuterRadiusStateFile, valueStr);
+                
+                // Send notification
+                GLib.spawn_command_line_async(`notify-send "Waybar" "Radius: ${valueStr}px" -t 2000`);
+            } catch (e) {
+                print('Error updating waybar outer radius: ' + e.message);
+            }
+        }
+        
+        entry.connect('activate', () => {
+            updateWaybarOuterRadius(entry.get_text());
+        });
+        
+        row.append(lbl);
+        row.append(entry);
+        rightTogglesBox.append(row);
+    }
     
+    addWaybarOuterRadiusRow('Waybar Radius');
     addWaybarSideMarginsRow('Waybar Sides');
     addWaybarTopMarginRow('Waybar Top');
     
