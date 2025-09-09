@@ -3529,6 +3529,7 @@ decoration {
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
+windowrulev2 = opacity 0.85 0.85,class:^(kitty|kitty-scratchpad|Alacritty)$
 windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
 windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
@@ -3548,6 +3549,26 @@ windowrule = pin,class:(.*waypaper.*)w
 windowrule = float,class:(blueman-manager)
 windowrule = size 800 600,class:(blueman-manager)
 windowrule = center,class:(blueman-manager)
+# Weather
+windowrule = float,class:(org.gnome.Weather)
+windowrule = size 700 600,class:(org.gnome.Weather)
+windowrule = move 25% 10%-,class:(org.gnome.Weather)
+windowrule = pin,class:(org.gnome.Weather)
+# Files
+windowrule = float,title:(Open Files)
+windowrule = size 700 600,title:(Open Files)
+windowrule = move 25% 10%-,title:(Open Files)
+windowrule = pin,title:(Open Files)
+
+windowrule = float,title:(Select Copy Destination)
+windowrule = size 700 600,title:(Select Copy Destination)
+windowrule = move 25% 10%-,title:(Select Copy Destination)
+windowrule = pin,title:(Select Copy Destination)
+
+windowrule = float,title:(Select Move Destination)
+windowrule = size 700 600,title:(Select Move Destination)
+windowrule = move 25% 10%-,title:(Select Move Destination)
+windowrule = pin,title:(Select Move Destination)
 # nwg-look
 windowrule = float,class:(nwg-look)
 windowrule = size 700 600,class:(nwg-look)
@@ -3639,7 +3660,7 @@ windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(code-oss)$
 windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^([Cc]ode)$
 # # windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(code-url-handler)$
 # # windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(code-insiders-url-handler)$
-windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(kitty)$
+windowrulev2 = opacity 0.85 $& 0.85 $& 0.85,class:^(kitty|kitty-scratchpad|Alacritty)$
 # # windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(org.kde.dolphin)$
 # # windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(org.kde.ark)$
 windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(nwg-look)$
@@ -4036,6 +4057,7 @@ decoration {
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
+windowrulev2 = opacity 0.85 0.85,class:^(kitty|kitty-scratchpad|Alacritty)$
 windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
 windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
@@ -4055,6 +4077,26 @@ windowrule = pin,class:(.*waypaper.*)w
 windowrule = float,class:(blueman-manager)
 windowrule = size 800 600,class:(blueman-manager)
 windowrule = center,class:(blueman-manager)
+# Weather
+windowrule = float,class:(org.gnome.Weather)
+windowrule = size 700 600,class:(org.gnome.Weather)
+windowrule = move 25% 10%-,class:(org.gnome.Weather)
+windowrule = pin,class:(org.gnome.Weather)
+# Files
+windowrule = float,title:(Open Files)
+windowrule = size 700 600,title:(Open Files)
+windowrule = move 25% 10%-,title:(Open Files)
+windowrule = pin,title:(Open Files)
+
+windowrule = float,title:(Select Copy Destination)
+windowrule = size 700 600,title:(Select Copy Destination)
+windowrule = move 25% 10%-,title:(Select Copy Destination)
+windowrule = pin,title:(Select Copy Destination)
+
+windowrule = float,title:(Select Move Destination)
+windowrule = size 700 600,title:(Select Move Destination)
+windowrule = move 25% 10%-,title:(Select Move Destination)
+windowrule = pin,title:(Select Move Destination)
 # nwg-look
 windowrule = float,class:(nwg-look)
 windowrule = size 700 600,class:(nwg-look)
@@ -4146,7 +4188,7 @@ windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(code-oss)$
 windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^([Cc]ode)$
 # # windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(code-url-handler)$
 # # windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(code-insiders-url-handler)$
-windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(kitty)$
+windowrulev2 = opacity 0.85 $& 0.85 $& 0.85,class:^(kitty|kitty-scratchpad|Alacritty)$
 # # windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(org.kde.dolphin)$
 # # windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(org.kde.ark)$
 windowrulev2 = opacity 1.0 $& 1.0 $& 1,class:^(nwg-look)$
