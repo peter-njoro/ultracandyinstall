@@ -322,7 +322,6 @@ build_package_list() {
         
         # Customization and theming
         "matugen-bin"
-        "wallust"
         
         # Editors
         "gedit"
@@ -2326,7 +2325,6 @@ COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
 
 # Update local background.png
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
-    wallust run ~/.config/background &
     magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
    
     # Check if colors have changed and launch dock if different
@@ -2705,15 +2703,6 @@ trigger_matugen() {
         echo "⚠️  Matugen config not found at: $MATUGEN_CONFIG"
     fi
 }
-trigger_wallust() {
-    if command -v wallust >/dev/null 2>&1; then
-        echo "🎨 Triggering wallust color generation..."
-        wallust run ~/.config/background &
-        echo "✅ Wallust color generation started"
-    else
-        echo "⚠️  Wallust not found"
-    fi
-}
 restart_swaync() {
     pkill -f swaync
     sleep 0.1
@@ -2722,7 +2711,6 @@ restart_swaync() {
 execute_color_generation() {
     echo "🚀 Starting color generation for new background..."
     trigger_matugen
-    trigger_wallust
     restart_swaync
     sleep 1
     echo "✅ Color generation processes initiated"
@@ -3451,8 +3439,8 @@ general {
     gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $inverse_primary #$on_primary_fixed_variant $primary_fixed_dim 90deg
-    col.inactive_border = $background
+    #col.active_border = $inverse_primary
+    col.inactive_border = $scrim
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
@@ -3526,6 +3514,7 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+windowrule = bordercolor $inverse_primary,class:^(.*)
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
@@ -3979,15 +3968,15 @@ general {
     gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $inverse_primary #$on_primary_fixed_variant $primary_fixed_dim 90deg
-    col.inactive_border = $background
+    #col.active_border = $inverse_primary
+    col.inactive_border = $scrim
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
 group:groupbar:col.active =  $primary_fixed_dim
-group:groupbar:col.inactive = $background
+group:groupbar:col.inactive = $inverse_primary
 
 dwindle {
     pseudotile = true
@@ -4054,6 +4043,7 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+windowrule = bordercolor $inverse_primary,class:^(.*)
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
