@@ -2670,7 +2670,7 @@ update_config_background() {
 trigger_matugen() {
     if [ -f "$MATUGEN_CONFIG" ]; then
         echo "🎨 Triggering matugen color generation..."
-        matugen image "$CONFIG_BG" --type scheme-content --contrast 0.6 &
+        matugen image "$CONFIG_BG" --type scheme-content --contrast 0.7 &
         echo "✅ Matugen color generation started"
     else
         echo "⚠️  Matugen config not found at: $MATUGEN_CONFIG"
