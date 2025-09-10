@@ -3439,7 +3439,7 @@ general {
     gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    #col.active_border = $inverse_primary
+    col.active_border = $inverse_primary
     col.inactive_border = $scrim
     layout = dwindle
     resize_on_border = true
@@ -3514,7 +3514,6 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-windowrule = bordercolor $inverse_primary,class:^(.*)
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
@@ -3968,7 +3967,7 @@ general {
     gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    #col.active_border = $inverse_primary
+    col.active_border = $inverse_primary
     col.inactive_border = $scrim
     layout = dwindle
     resize_on_border = true
@@ -4043,7 +4042,6 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-windowrule = bordercolor $inverse_primary,class:^(.*)
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
