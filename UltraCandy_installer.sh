@@ -3999,14 +3999,9 @@ plugin {
         bg_col = $inverse_primary
         workspace_method = center current
         
-        # Try these parameters for floating behavior
-        floating = true          # If supported
-        window_mode = true       # Alternative parameter
-        fullscreen = false       # Disable fullscreen mode
-        
         enable_gesture = true
         gesture_fingers = 3
-        gesture_distance = 400
+        gesture_distance = 250
         gesture_positive = true
         
         workspace_scale = 0.6
@@ -4554,14 +4549,9 @@ plugin {
         bg_col = $inverse_primary
         workspace_method = center current
         
-        # Try these parameters for floating behavior
-        floating = true          # If supported
-        window_mode = true       # Alternative parameter
-        fullscreen = false       # Disable fullscreen mode
-        
         enable_gesture = true
         gesture_fingers = 3
-        gesture_distance = 400
+        gesture_distance = 250
         gesture_positive = true
         
         workspace_scale = 0.6
