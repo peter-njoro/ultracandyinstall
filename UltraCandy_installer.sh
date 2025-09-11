@@ -296,6 +296,8 @@ build_package_list() {
         "wlogout"
         "uwsm"
         "pacman-contrib"
+        "hyprland-plugin-hyprexpo"
+        "eww"
 
         # Application launchers and menus
         "rofi-wayland"
@@ -604,9 +606,9 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[✔](green)"
-error_symbol = "[x](red)"
-vimcmd_symbol = "[❮](green)"
+success_symbol = "[󱞪 ](green)"
+error_symbol = "[󱞪 x](red)"
+vimcmd_symbol = "[󱞪 ❮](green)"
 
 [git_branch]
 symbol = "🌱 "
@@ -788,9 +790,9 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[✔](green)"
-error_symbol = "[x](red)"
-vimcmd_symbol = "[❮](green)"
+success_symbol = "[󱞪 ](green)"
+error_symbol = "[󱞪 x](red)"
+vimcmd_symbol = "[󱞪 ❮](green)"
 
 [git_branch]
 symbol = "🌱 "
@@ -980,7 +982,7 @@ setup_ultracandy() {
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
-    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi swaync wallust waybar waypaper wlogout xsettingsd
+    rm -rf background background.png btop cava eww fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi swaync wallust waybar waypaper wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
