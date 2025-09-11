@@ -265,6 +265,7 @@ build_package_list() {
         "hyprutils"
         "hyprwayland-scanner"
         "xdg-desktop-portal-hyprland"
+        "hyprland-plugin-hyprexpo"
         
         # GNOME components (always include gnome-control-center and gnome-tweaks)
         "gnome-control-center"
@@ -296,8 +297,6 @@ build_package_list() {
         "wlogout"
         "uwsm"
         "pacman-contrib"
-        "hyprland-plugin-hyprexpo"
-        "eww"
 
         # Application launchers and menus
         "rofi-wayland"
@@ -982,7 +981,7 @@ setup_ultracandy() {
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
-    rm -rf background background.png btop cava eww fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi swaync wallust waybar waypaper wlogout xsettingsd
+    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi swaync wallust waybar waypaper wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
