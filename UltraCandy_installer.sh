@@ -3985,6 +3985,34 @@ misc {
     disable_splash_rendering = false
     initial_workspace_tracking = 1
 }
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                            Plugins                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+plugin = /usr/lib/libhyprexpo.so
+
+plugin {
+    hyprexpo {
+        columns = 3
+        gap_size = 8
+        bg_col = $inverse_primary
+        workspace_method = center current
+        
+        # Try these parameters for floating behavior
+        floating = true          # If supported
+        window_mode = true       # Alternative parameter
+        fullscreen = false       # Disable fullscreen mode
+        
+        enable_gesture = true
+        gesture_fingers = 3
+        gesture_distance = 400
+        gesture_positive = true
+        
+        workspace_scale = 0.6
+        border_size = 2
+    }
+}
 EOF
 
 else  
@@ -4513,6 +4541,33 @@ misc {
     disable_splash_rendering = false
     initial_workspace_tracking = 1
 }
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                            Plugins                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+plugin = /usr/lib/libhyprexpo.so
+
+plugin {
+    hyprexpo {
+        columns = 3
+        gap_size = 8
+        bg_col = $inverse_primary
+        workspace_method = center current
+        
+        # Try these parameters for floating behavior
+        floating = true          # If supported
+        window_mode = true       # Alternative parameter
+        fullscreen = false       # Disable fullscreen mode
+        
+        enable_gesture = true
+        gesture_fingers = 3
+        gesture_distance = 400
+        gesture_positive = true
+        
+        workspace_scale = 0.6
+        border_size = 2
+    }
+}
 EOF
 fi
 
@@ -4719,6 +4774,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 
 #### Actions ####
 
+bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Workspace view
 bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
@@ -4940,6 +4996,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 
 #### Actions ####
 
+bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Workspace view
 bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
