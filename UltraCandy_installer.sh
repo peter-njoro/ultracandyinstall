@@ -3727,6 +3727,11 @@ windowrule = float,title:(Select Move Destination)
 windowrule = size 700 600,title:(Select Move Destination)
 windowrule = move 25% 10%-,title:(Select Move Destination)
 windowrule = pin,title:(Select Move Destination)
+
+windowrule = float,title:(Save As)
+windowrule = size 700 600,title:(Save As)
+windowrule = move 25% 10%-,title:(Save As)
+windowrule = pin,title:(Save As)
 # nwg-look
 windowrule = float,class:(nwg-look)
 windowrule = size 700 600,class:(nwg-look)
@@ -4279,6 +4284,11 @@ windowrule = float,title:(Select Move Destination)
 windowrule = size 700 600,title:(Select Move Destination)
 windowrule = move 25% 10%-,title:(Select Move Destination)
 windowrule = pin,title:(Select Move Destination)
+
+windowrule = float,title:(Save As)
+windowrule = size 700 600,title:(Save As)
+windowrule = move 25% 10%-,title:(Save As)
+windowrule = pin,title:(Save As)
 # nwg-look
 windowrule = float,class:(nwg-look)
 windowrule = size 700 600,class:(nwg-look)
