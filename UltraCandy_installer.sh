@@ -3700,7 +3700,7 @@ windowrule = pin, title:^(Picture-in-Picture)$
 windowrule = move 69.5% 4%, title:^(Picture-in-Picture)$
 # Waypaper
 windowrule = float,class:(.*waypaper.*)
-windowrule = size 900 700,class:(.*waypaper.*)
+windowrule = size 800 600,class:(.*waypaper.*)
 windowrule = center,class:(.*waypaper.*)
 windowrule = pin,class:(.*waypaper.*)w
 # Blueman Manager
@@ -4252,7 +4252,7 @@ windowrule = pin, title:^(Picture-in-Picture)$
 windowrule = move 69.5% 4%, title:^(Picture-in-Picture)$
 # Waypaper
 windowrule = float,class:(.*waypaper.*)
-windowrule = size 900 700,class:(.*waypaper.*)
+windowrule = size 800 600,class:(.*waypaper.*)
 windowrule = center,class:(.*waypaper.*)
 windowrule = pin,class:(.*waypaper.*)w
 # Blueman Manager
