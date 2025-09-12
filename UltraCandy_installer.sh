@@ -981,7 +981,7 @@ setup_ultracandy() {
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
-    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi swaync wallust waybar waypaper wlogout xsettingsd
+    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcustom hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi swaync wallust waybar waypaper wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
@@ -6107,13 +6107,13 @@ function createCandyUtilsBox() {
     
     let currentMatugenScheme = loadMatugenState();
     
-    // Matugen scheme buttons
+        // Matugen scheme buttons
     const matugenSchemes = [
+        'Dark',
+        'Light',
         'Content',
         'Expressive', 
-        'Fidelity',
         'Fruit-salad',
-        'Monochrome',
         'Neutral',
         'Rainbow',
         'Tonal-spot'
@@ -6126,11 +6126,11 @@ function createCandyUtilsBox() {
         
         // Convert scheme name to matugen format
         const schemeMap = {
+            'Dark': 'scheme-monochrome',
+            'Light': 'scheme-fidelity',
             'Content': 'scheme-content',
             'Expressive': 'scheme-expressive',
-            'Fidelity': 'scheme-fidelity',
             'Fruit-salad': 'scheme-fruit-salad',
-            'Monochrome': 'scheme-monochrome',
             'Neutral': 'scheme-neutral',
             'Rainbow': 'scheme-rainbow',
             'Tonal-spot': 'scheme-tonal-spot'
@@ -6143,14 +6143,52 @@ function createCandyUtilsBox() {
         GLib.spawn_command_line_async(`sed -i 's/--type scheme-[^ ]*/--type ${matugenScheme}/' '${waypaperIntegrationFile}'`);
         
         // Handle monochrome vs other schemes for GTK CSS
-        if (schemeName === 'Monochrome') {
-            // Replace @on_secondary with @on_primary_fixed_variant for monochrome
+        if (schemeName === 'Dark') {
+            // Replace @on_secondary with @on_primary_fixed_variant for dark/monochrome
             GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk4File}'`);
-        } else {
+        }
+        
+        if (schemeName === 'Light') {
+            // Replace @on_secondary with @on_primary_fixed_variant for dark/monochrome
+            GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk3File}'`);
+            GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk4File}'`);
+        }
+        
+        if (schemeName === 'Content') {
             // Replace @on_primary_fixed_variant with @on_secondary for other schemes
             GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
+        }
+        
+        if (schemeName === 'Expressive') {
+            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
+        }
+        
+        if (schemeName === 'Fruit-salad') {
+            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
+        }
+        
+        if (schemeName === 'Neutral') {
+            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`); 
+        }
+        
+        if (schemeName === 'Rainbow') {
+            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
+        }
+        
+        if (schemeName === 'Tonal-spot') {
+            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
+            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`); 
         }
         
         // Save the new state
@@ -6167,11 +6205,11 @@ function createCandyUtilsBox() {
             const btn = matugenButtons[i];
             const schemeName = matugenSchemes[i];
             const schemeMap = {
+                'Dark': 'scheme-monochrome',
+                'Light': 'scheme-fidelity',
                 'Content': 'scheme-content',
                 'Expressive': 'scheme-expressive',
-                'Fidelity': 'scheme-fidelity',
                 'Fruit-salad': 'scheme-fruit-salad',
-                'Monochrome': 'scheme-monochrome',
                 'Neutral': 'scheme-neutral',
                 'Rainbow': 'scheme-rainbow',
                 'Tonal-spot': 'scheme-tonal-spot'
