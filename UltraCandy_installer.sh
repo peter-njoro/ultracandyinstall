@@ -4710,13 +4710,13 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 # ██║  ██╗███████╗   ██║   ██████╔╝██║██║ ╚████║██████╔╝███████║
 # ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═════╝ ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝
 
-#### $ ####
+#
 $mainMod = SUPER
 $HYPRSCRIPTS = ~/.config/hypr/scripts
 $SCRIPTS = ~/.config/hyprcandy/scripts
 $EDITOR = gedit # Change from the default editor to your prefered editor
-#$DISCORD = equibop
-#### $ ####
+$DISCORD = equibop
+#
 
 #### Kill active window ####
 
@@ -4932,13 +4932,13 @@ else
 # ██║  ██╗███████╗   ██║   ██████╔╝██║██║ ╚████║██████╔╝███████║
 # ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═════╝ ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝
 
-#### $ ####
+#
 $mainMod = SUPER
 $HYPRSCRIPTS = ~/.config/hypr/scripts
 $SCRIPTS = ~/.config/hyprcandy/scripts
 $EDITOR = gedit # Change from the default editor to your prefered editor
-#$DISCORD = equibop
-#### $ ####
+$DISCORD = equibop
+#
 
 #### Kill active window ####
 
