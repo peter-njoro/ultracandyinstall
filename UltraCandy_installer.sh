@@ -11409,7 +11409,7 @@ setup_keyboard_layout() {
 
 pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &
 sleep 1
-swww img "$HOME/.config/background"
+swww img "$HOME/.ultracandy/.config/background"
 
 # Start the correct services
 
@@ -11458,7 +11458,7 @@ prompt_reboot() {
     read -r reboot_choice
     case "$reboot_choice" in
         [nN][oO]|[nN])
-            print_status "Reboot skipped. Please reboot manually when convenient."
+            print_status "Reboot skipped. Please reboot manually when convenient and note that some processes won't function properly until you reboot."
             print_status "Run: sudo reboot"
             rm -rf "$HOME/ultracandyinstall"
             ;;
