@@ -3630,15 +3630,16 @@ master {
     drop_at_cursor = true
 }
 
+gesture = 3, horizontal, workspace
+gesture = 4, swipe, move,
+gesture = 4, pinch, float
 gestures {
-  workspace_swipe = true
-  workspace_swipe_fingers = 3
-  workspace_swipe_distance = 500
-  workspace_swipe_invert = true
-  workspace_swipe_min_speed_to_force = 30
-  workspace_swipe_cancel_ratio = 0.5
-  workspace_swipe_create_new = true
-  workspace_swipe_forever = true
+    workspace_swipe_distance = 700
+    workspace_swipe_cancel_ratio = 0.2
+    workspace_swipe_min_speed_to_force = 5
+    workspace_swipe_direction_lock = true
+    workspace_swipe_direction_lock_threshold = 10
+    workspace_swipe_create_new = true
 }
 
 binds {
@@ -4181,15 +4182,16 @@ master {
     drop_at_cursor = true
 }
 
+gesture = 3, horizontal, workspace
+gesture = 4, swipe, move,
+gesture = 4, pinch, float
 gestures {
-  workspace_swipe = true
-  workspace_swipe_fingers = 3
-  workspace_swipe_distance = 500
-  workspace_swipe_invert = true
-  workspace_swipe_min_speed_to_force = 30
-  workspace_swipe_cancel_ratio = 0.5
-  workspace_swipe_create_new = true
-  workspace_swipe_forever = true
+    workspace_swipe_distance = 700
+    workspace_swipe_cancel_ratio = 0.2
+    workspace_swipe_min_speed_to_force = 5
+    workspace_swipe_direction_lock = true
+    workspace_swipe_direction_lock_threshold = 10
+    workspace_swipe_create_new = true
 }
 
 binds {
