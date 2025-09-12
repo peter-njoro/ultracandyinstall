@@ -11420,19 +11420,6 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 else
     systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
-
-sleep 6
-
-systemctl --user stop hyprpanel.service hyprpanel-idle-monitor.service waybar-idle-monitor.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
-
-sleep 1
-
-sleep
-if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user start waybar-idle-monitor.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
-else
-    systemctl --user start hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
-fi
 echo "✅ Services set..."
 
 # Update SDDM background with sudo
