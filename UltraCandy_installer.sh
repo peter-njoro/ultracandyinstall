@@ -2229,6 +2229,13 @@ set +e
 # Define colors file path
 COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
 
+restart_swaync() {
+    pkill -f swaync
+    sleep 0.1
+    swaync &
+}
+restart_swaync
+
 # Update local background.png
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
@@ -2869,15 +2876,9 @@ trigger_matugen() {
         echo "⚠️  Matugen config not found at: $MATUGEN_CONFIG"
     fi
 }
-restart_swaync() {
-    pkill -f swaync
-    sleep 0.1
-    swaync &
-}
 execute_color_generation() {
     echo "🚀 Starting color generation for new background..."
     trigger_matugen
-    restart_swaync
     sleep 1
     echo "✅ Color generation processes initiated"
 }
