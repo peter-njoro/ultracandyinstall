@@ -4724,9 +4724,9 @@ bind = $mainMod, Escape, killactive #Kill single active window
 bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill #Quit active window and all similar open instances
 
 #### Rofi Menus ####
-
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
+bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
 bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
 bind = $mainMod CTRL, E, exec, ~/.config/hyprcandy/settings/emojipicker.sh 		  #Open rofi emoji-picker
 bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #Open rofi glyph-picker
@@ -4946,9 +4946,9 @@ bind = $mainMod, Escape, killactive #Kill single active window
 bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill #Quit active window and all similar open instances
 
 #### Rofi Menus ####
-
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
+bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
 bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
 bind = $mainMod CTRL, E, exec, ~/.config/hyprcandy/settings/emojipicker.sh 		  #Open rofi emoji-picker
 bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #Open rofi glyph-picker
