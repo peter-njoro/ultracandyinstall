@@ -11410,10 +11410,30 @@ pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &
 sleep 1
 swww img "$HOME/.config/background"
 
+# Start the correct services
+
+echo "🔄 Setting up services..."
 systemctl --user daemon-reload
-systemctl --user disable --now hyprpanel.service hyprpanel-idle-monitor.service waybar.service waybar-idle-monitor.service waypaper-watcher.service background-watcher.service swww.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
-sleep 1
+
+if [ "$PANEL_CHOICE" = "waybar" ]; then
+    systemctl --user restart waybar-idle-monitor.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+else
+    systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+fi
+
+sleep 6
+
 systemctl --user stop hyprpanel.service hyprpanel-idle-monitor.service waybar-idle-monitor.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+
+sleep 1
+
+sleep
+if [ "$PANEL_CHOICE" = "waybar" ]; then
+    systemctl --user start waybar-idle-monitor.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+else
+    systemctl --user start hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+fi
+echo "✅ Services set..."
 
 # Update SDDM background with sudo
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
