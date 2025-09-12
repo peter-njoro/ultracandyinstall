@@ -3471,7 +3471,7 @@ setup_custom_config() {
 # ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
 
 #[IMPORTANT]#
-# Your custom settings made in this file are safe from resets after rerunning the script.
+# Add custom settings at the very end of the file.
 # To reset, delete the 'hyprcustom' folder (not just the 'custom.conf' file) before rerunning the script to regenerate the default setup.
 #[IMPORTANT]#
 
@@ -3943,10 +3943,10 @@ layerrule = blur,rofi
 layerrule = ignorezero,rofi
 layerrule = blur,notifications
 layerrule = ignorezero,notifications
-#layerrule = blur,swaync-notification-window
-#layerrule = ignorezero,swaync-notification-window
-#layerrule = blur,swaync-control-center
-#layerrule = ignorezero,swaync-control-center
+layerrule = blur,swaync-notification-window
+layerrule = ignorezero,swaync-notification-window
+layerrule = blur,swaync-control-center
+layerrule = ignorezero,swaync-control-center
 layerrule = blur,nwg-dock
 layerrule = ignorezero,nwg-dock
 layerrule = blur,logout_dialog
@@ -4022,7 +4022,7 @@ else
 # ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
 
 #[IMPORTANT]#
-# Your custom settings made in this file are safe from resets after rerunning the script.
+# Add custom settings at the very end of the file.
 # To reset, delete the 'hyprcustom' folder (not just the 'custom.conf' file) before rerunning the script to regenerate the default setup.
 #[IMPORTANT]#
 
@@ -4494,10 +4494,10 @@ layerrule = blur,rofi
 layerrule = ignorezero,rofi
 layerrule = blur,notifications
 layerrule = ignorezero,notifications
-#layerrule = blur,swaync-notification-window
-#layerrule = ignorezero,swaync-notification-window
-#layerrule = blur,swaync-control-center
-#layerrule = ignorezero,swaync-control-center
+layerrule = blur,swaync-notification-window
+layerrule = ignorezero,swaync-notification-window
+layerrule = blur,swaync-control-center
+layerrule = ignorezero,swaync-control-center
 layerrule = blur,nwg-dock
 layerrule = ignorezero,nwg-dock
 layerrule = blur,logout_dialog
