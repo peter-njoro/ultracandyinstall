@@ -3685,6 +3685,7 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+windowrule = bordercolor $inverse_primary,class:^(.*)
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
@@ -4242,6 +4243,7 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+windowrule = bordercolor $inverse_primary,class:^(.*)
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
