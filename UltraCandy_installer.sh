@@ -273,6 +273,7 @@ build_package_list() {
         "gnome-weather"
         "gnome-software"
         "gnome-calculator"
+        "gnome-terminal"
         "mutter"
 
         # Flatpak base repo for Gnome Software app
