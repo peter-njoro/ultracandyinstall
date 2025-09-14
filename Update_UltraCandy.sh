@@ -3680,7 +3680,7 @@ decoration {
 
     blur {
     enabled = true
-    size = 6
+    size = 3
     passes = 3
     new_optimizations = on
     ignore_opacity = true
@@ -4242,7 +4242,7 @@ decoration {
 
     blur {
     enabled = true
-    size = 6
+    size = 3
     passes = 3
     new_optimizations = on
     ignore_opacity = true
