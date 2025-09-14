@@ -3911,6 +3911,10 @@ windowrule = float,title:^(Confirm to replace files)$
 windowrule = float,title:^(File Operation Progress)$
 windowrulev2 = float,class:^(xdg-desktop-portal-gtk)$
 
+# installer
+windowrule = float, class:(floating-installer)
+windowrule = center, class:(floating-installer)
+
 # Workspaces Rules https://wiki.hyprland.org/0.45.0/Configuring/Workspace-Rules/ #
 # workspace = 1, default:true, monitor:$priMon
 # workspace = 6, default:true, monitor:$secMon
@@ -4468,6 +4472,10 @@ windowrule = float,title:^(Save As)$
 windowrule = float,title:^(Confirm to replace files)$
 windowrule = float,title:^(File Operation Progress)$
 windowrulev2 = float,class:^(xdg-desktop-portal-gtk)$
+
+# installer
+windowrule = float, class:(floating-installer)
+windowrule = center, class:(floating-installer)
 
 # Workspaces Rules https://wiki.hyprland.org/0.45.0/Configuring/Workspace-Rules/ #
 # workspace = 1, default:true, monitor:$priMon
