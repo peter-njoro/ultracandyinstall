@@ -102,7 +102,7 @@ choose_display_manager() {
 }
 
 choose_panel() {
-    echo -e "${CYAN}Choose your panel: you can also rerun the script to switch from either or regenerate UltraCandy's default panel setup:${NC}"
+    echo -e "${CYAN}The update is based on your status-bar choice:${NC}"
     echo -e "${GREEN}1) Waybar${NC}"
     echo "   • Light with fast startup/reload for a 'taskbar' like experience"
     echo "   • Highly customizable manually"
