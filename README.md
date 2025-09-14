@@ -8,9 +8,7 @@ Needed packages: git, hyprland, kitty
 
 Run:
 ```shell
-git clone https://github.com/HyprCandy/ultracandyinstall.git && cd ultracandyinstall
-```
-followed by:
-```shell
+git clone https://github.com/HyprCandy/ultracandyinstall.git &&
+cd ultracandyinstall && 
 bash UltraCandy_installer.sh
 ```
