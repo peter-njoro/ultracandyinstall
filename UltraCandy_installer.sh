@@ -4735,6 +4735,8 @@ bind = $mainMod, Escape, killactive #Kill single active window
 bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill #Quit active window and all similar open instances
 
 #### Rofi Menus ####
+
+bind = CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
@@ -4957,6 +4959,8 @@ bind = $mainMod, Escape, killactive #Kill single active window
 bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill #Quit active window and all similar open instances
 
 #### Rofi Menus ####
+
+bind = CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
