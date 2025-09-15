@@ -2350,6 +2350,8 @@ reload_gtk_apps() {
     for signal in SIGHUP SIGUSR2; do
         pkill -$signal -f "nautilus\|gnome-\|evince\|gedit" 2>/dev/null || true
     done
+
+    sleep 5 && systemctl --user start cursor-theme-watcher #Watches for system cursor theme & size changes to update cursor theme & size on re-login
 }
 
 # Alternative: Add this function to force specific app reloads if needed
@@ -2514,6 +2516,8 @@ reload_gtk_apps() {
     for signal in SIGHUP SIGUSR2; do
         pkill -$signal -f "nautilus\|gnome-\|evince\|gedit" 2>/dev/null || true
     done
+
+    sleep 5 && systemctl --user start cursor-theme-watcher #Watches for system cursor theme & size changes to update cursor theme & size on re-login
 }
 
 # Alternative: Add this function to force specific app reloads if needed
