@@ -2190,15 +2190,22 @@ chmod +x "$HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh"
 cat > "$HOME/.config/systemd/user/cursor-theme-watcher.service" << 'EOF'
 [Unit]
 Description=Watch GTK cursor theme and size changes
-After=graphical-session.target
+After=hyprland-session.target
+PartOf=hyprland-session.target
 
 [Service]
 Type=simple
-ExecStart=%h/.config/hyprcandy/hooks/watch_cursor_theme.sh
+ExecStart=/home/king/.config/hyprcandy/hooks/watch_cursor_theme.sh
 Restart=on-failure
+RestartSec=5
+
+# Import environment variables from the user session
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+# These will be set by the ExecStartPre command
+ExecStartPre=/bin/bash -c 'systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP WAYLAND_DISPLAY DISPLAY'
 
 [Install]
-WantedBy=default.target
+WantedBy=hyprland-session.target
 EOF
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
@@ -2674,14 +2681,22 @@ chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
 Description=Watch ~/.config/background, clear swww cache and update background images
-After=graphical-session.target hyprland-session.target
+After=hyprland-session.target
+PartOf=hyprland-session.target
 
 [Service]
+Type=simple
 ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
 Restart=on-failure
+RestartSec=5
+
+# Import environment variables from the user session
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+# These will be set by the ExecStartPre command
+ExecStartPre=/bin/bash -c 'systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP WAYLAND_DISPLAY DISPLAY'
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=hyprland-session.target
 EOF
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
@@ -3493,7 +3508,6 @@ exec-once = systemctl --user start background-watcher #Watches for system backgr
 exec-once = systemctl --user start waybar-idle-monitor #Watches bar/panel running status to enable/disable idle-inhibitor
 exec-once = systemctl --user start waypaper-watcher #Watches for system waypaper changes to trigger color generation
 exec-once = systemctl --user start rofi-font-watcher #Watches for system font changes to update rofi-font.rasi
-exec-once = sleep 10 && systemctl --user start cursor-theme-watcher #Watches for system cursor theme & size changes to update cursor theme & size on re-login
 exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
@@ -4055,7 +4069,6 @@ exec-once = systemctl --user start background-watcher #Watches for system backgr
 exec-once = systemctl --user start hyprpanel-idle-monitor #Watches bar/panel running status to enable/disable idle-inhibitor
 #exec-once = systemctl --user start waypaper-watcher #Watches for system waypaper changes to trigger color generation
 exec-once = systemctl --user start rofi-font-watcher #Watches for system font changes to update rofi-font.rasi
-exec-once = sleep 10 && systemctl --user start cursor-theme-watcher #Watches for system cursor theme & size changes to update cursor theme & size on re-login
 exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
