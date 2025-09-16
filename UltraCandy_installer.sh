@@ -2629,7 +2629,6 @@ monitor_matugen() {
     
     echo "✅ Matugen finished, executing hooks"
     execute_hooks
-    bash "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
 }
 
 # ⏳ Wait for background file to exist
@@ -3933,6 +3932,10 @@ windowrulev2 = float,class:^(xdg-desktop-portal-gtk)$
 windowrule = float, class:(floating-installer)
 windowrule = center, class:(floating-installer)
 
+# clock
+windowrule = float, class:(clock)
+windowrule = center, class:(clock)
+
 # Workspaces Rules https://wiki.hyprland.org/0.45.0/Configuring/Workspace-Rules/ #
 # workspace = 1, default:true, monitor:$priMon
 # workspace = 6, default:true, monitor:$secMon
@@ -4493,6 +4496,10 @@ windowrulev2 = float,class:^(xdg-desktop-portal-gtk)$
 # installer
 windowrule = float, class:(floating-installer)
 windowrule = center, class:(floating-installer)
+
+# clock
+windowrule = float, class:(clock)
+windowrule = center, class:(clock)
 
 # Workspaces Rules https://wiki.hyprland.org/0.45.0/Configuring/Workspace-Rules/ #
 # workspace = 1, default:true, monitor:$priMon
