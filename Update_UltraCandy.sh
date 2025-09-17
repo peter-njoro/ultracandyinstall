@@ -3557,7 +3557,7 @@ exec-once = systemctl --user restart background-watcher
 # ┃                           Animations                        ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-source = ~/.config/hypr/conf/animations/silent.conf
+source = ~/.config/hypr/conf/animations/vertical.conf
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                        Hypraland-colors                     ┃
@@ -4123,7 +4123,7 @@ exec-once = systemctl --user restart background-watcher
 # ┃                           Animations                        ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-source = ~/.config/hypr/conf/animations/silent.conf
+source = ~/.config/hypr/conf/animations/vertical.conf
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                        Hypraland-colors                     ┃
