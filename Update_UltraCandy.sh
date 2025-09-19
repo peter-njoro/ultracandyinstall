@@ -2213,7 +2213,7 @@ PartOf=hyprland-session.target
 
 [Service]
 Type=simple
-ExecStart=/home/king/.config/hyprcandy/hooks/watch_cursor_theme.sh
+ExecStart=%h/.config/hyprcandy/hooks/watch_cursor_theme.sh
 Restart=on-failure
 RestartSec=5
 
