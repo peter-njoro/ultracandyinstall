@@ -4762,7 +4762,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 
 #### Rofi Menus ####
 
-bind = CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
+bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
@@ -4817,7 +4817,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 #### Actions ####
 
 bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
-bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
+bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
 bind = $mainMod CTRL, Q, exec, $SCRIPTS/wlogout.sh            				  #Start wlogout ~/.config/hyprcandy/scripts
@@ -4927,11 +4927,11 @@ bind = $mainMod SHIFT, L, exec, hyprctl keyword general:layout "$(hyprctl getopt
 
 #### Fn keys ####
 
-bind = , XF86MonBrightnessUp, exec, brightnessctl -q s +10% #Increase brightness by 10%
-bind = , XF86MonBrightnessDown, exec, brightnessctl -q s 10%- #Reduce brightness by 10%
-bind = , XF86AudioRaiseVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5%   #Increase volume by 5%
-bind = , XF86AudioLowerVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5%  #Reduce volume by 5%
-bind = , XF86AudioMute, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle #Toggle mute
+bind = , XF86MonBrightnessUp, exec, brightnessctl -q s +10% #Increase brightness by 10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , XF86MonBrightnessDown, exec, brightnessctl -q s 10%- #Reduce brightness by 10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , XF86AudioRaiseVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , XF86AudioLowerVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , XF86AudioMute, exec, amixer sset Master toggle | sed -En '/\[on\]/ s/.*\[([0-9]+)%\].*/\1/ p; /\[off\]/ s/.*/0/p' | head -1 > /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && if amixer sget Master | grep -q '\[off\]'; then notify-send "Volume" "Muted" -t 1000; else notify-send "Volume" "$(amixer sget Master | grep -o '[0-9]*%' | head -1)" -t 1000; fi 
 bind = , XF86AudioPlay, exec, playerctl play-pause #Audio play pause
 bind = , XF86AudioPause, exec, playerctl pause #Audio pause
 bind = , XF86AudioNext, exec, playerctl next #Audio next
@@ -4986,7 +4986,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 
 #### Rofi Menus ####
 
-bind = CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
+bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
@@ -5041,7 +5041,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 #### Actions ####
 
 bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
-bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
+bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
 bind = $mainMod CTRL, Q, exec, $SCRIPTS/wlogout.sh            				  #Start wlogout ~/.config/hyprcandy/scripts
@@ -5151,11 +5151,11 @@ bind = $mainMod SHIFT, L, exec, hyprctl keyword general:layout "$(hyprctl getopt
 
 #### Fn keys ####
 
-bind = , XF86MonBrightnessUp, exec, brightnessctl -q s +10% #Increase brightness by 10%
-bind = , XF86MonBrightnessDown, exec, brightnessctl -q s 10%- #Reduce brightness by 10%
-bind = , XF86AudioRaiseVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5%   #Increase volume by 5%
-bind = , XF86AudioLowerVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5%  #Reduce volume by 5%
-bind = , XF86AudioMute, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle #Toggle mute
+bind = , XF86MonBrightnessUp, exec, brightnessctl -q s +10% #Increase brightness by 10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , XF86MonBrightnessDown, exec, brightnessctl -q s 10%- #Reduce brightness by 10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , XF86AudioRaiseVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , XF86AudioLowerVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , XF86AudioMute, exec, amixer sset Master toggle | sed -En '/\[on\]/ s/.*\[([0-9]+)%\].*/\1/ p; /\[off\]/ s/.*/0/p' | head -1 > /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && if amixer sget Master | grep -q '\[off\]'; then notify-send "Volume" "Muted" -t 1000; else notify-send "Volume" "$(amixer sget Master | grep -o '[0-9]*%' | head -1)" -t 1000; fi 
 bind = , XF86AudioPlay, exec, playerctl play-pause #Audio play pause
 bind = , XF86AudioPause, exec, playerctl pause #Audio pause
 bind = , XF86AudioNext, exec, playerctl next #Audio next
