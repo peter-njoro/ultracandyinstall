@@ -3725,7 +3725,7 @@ windowrule = bordercolor $inverse_primary,class:^(.*)
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
-windowrulev2 = opacity 0.85 0.85,class:^(kitty|kitty-scratchpad|Alacritty)$
+windowrulev2 = opacity 0.85 0.85,class:^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
 windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
 windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
@@ -4291,7 +4291,7 @@ windowrule = bordercolor $inverse_primary,class:^(.*)
 windowrule = move 73% 50,class:(Candy.SystemMonitor)
 windowrule = move 32% 50,class:(Candy.Media)
 windowrule = move 1% 50,class:(Candy.Weather)
-windowrulev2 = opacity 0.85 0.85,class:^(kitty|kitty-scratchpad|Alacritty)$
+windowrulev2 = opacity 0.85 0.85,class:^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
 windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
 windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
