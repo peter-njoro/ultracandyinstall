@@ -934,7 +934,7 @@ setup_ultracandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S waybar waypaper swaync
+        $AUR_HELPER -S waybar waypaper-git swaync
     else
         print_status "Ensuring necessary packages are installed"
         echo
@@ -4780,7 +4780,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 
 #### Rofi Menus ####
 
-bind = CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
+bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
@@ -4835,7 +4835,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 #### Actions ####
 
 bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
-bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
+bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
 bind = $mainMod CTRL, Q, exec, $SCRIPTS/wlogout.sh            				  #Start wlogout ~/.config/hyprcandy/scripts
@@ -5004,7 +5004,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 
 #### Rofi Menus ####
 
-bind = CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
+bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
@@ -5059,7 +5059,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 #### Actions ####
 
 bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
-bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
+bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
 bind = $mainMod CTRL, Q, exec, $SCRIPTS/wlogout.sh            				  #Start wlogout ~/.config/hyprcandy/scripts
