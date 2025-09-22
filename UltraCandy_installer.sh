@@ -3680,8 +3680,8 @@ decoration {
 
     blur {
     enabled = true
-    size = 3
-    passes = 3
+    size = 12
+    passes = 2
     new_optimizations = on
     ignore_opacity = true
     xray = false
@@ -4246,8 +4246,8 @@ decoration {
 
     blur {
     enabled = true
-    size = 3
-    passes = 3
+    size = 12
+    passes = 2
     new_optimizations = on
     ignore_opacity = true
     xray = false
