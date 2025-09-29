@@ -268,6 +268,7 @@ build_package_list() {
         "hyprland-plugin-hyprexpo"
         
         # GNOME components (always include gnome-control-center and gnome-tweaks)
+        "gnome-session"
         "gnome-control-center"
         "gnome-calendar"
         "gnome-tweaks"
