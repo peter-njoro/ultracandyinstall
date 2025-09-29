@@ -936,11 +936,11 @@ setup_ultracandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S waybar waypaper-git swaync
+        $AUR_HELPER -S waybar waypaper-git swaync hyprland-plugin-hyprexpo
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S ags-hyprpanel-git mako
+        $AUR_HELPER -S ags-hyprpanel-git mako hyprland-plugin-hyprexpo
     fi
     
     print_status "Setting up UltraCandy configuration..."
