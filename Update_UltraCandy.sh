@@ -11803,6 +11803,10 @@ main() {
     # Choose display manager first
     #choose_display_manager
     #echo
+
+    # Choose shell
+    choose_shell
+    echo
     
     # Choose a panel
     choose_panel
