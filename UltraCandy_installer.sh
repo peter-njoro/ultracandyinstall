@@ -268,6 +268,7 @@ build_package_list() {
         "hyprland-plugin-hyprexpo"
         
         # GNOME components (always include gnome-control-center and gnome-tweaks)
+        "mutter"
         "gnome-session"
         "gnome-control-center"
         "gnome-system-monitor"
@@ -277,7 +278,7 @@ build_package_list() {
         "gnome-software"
         "gnome-calculator"
         "gnome-terminal"
-        "mutter"
+        "evince"
 
         # Flatpak base repo for Gnome Software app
         "flatpak"
