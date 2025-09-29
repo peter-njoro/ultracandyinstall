@@ -268,6 +268,7 @@ build_package_list() {
         "hyprland-plugin-hyprexpo"
         
         # GNOME components (always include gnome-control-center and gnome-tweaks)
+        "mutter"
         "gnome-session"
         "gnome-control-center"
         "gnome-system-monitor"
@@ -277,7 +278,7 @@ build_package_list() {
         "gnome-software"
         "gnome-calculator"
         "gnome-terminal"
-        "mutter"
+        "evince"
 
         # Flatpak base repo for Gnome Software app
         "flatpak"
@@ -949,11 +950,11 @@ setup_ultracandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S waybar waypaper-git swaync hyprland-plugin-hyprexpo gnome-system-monitor
+        $AUR_HELPER --noconfirm -S waybar waypaper-git swaync hyprland-plugin-hyprexpo gnome-system-monitor evince
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S ags-hyprpanel-git mako hyprland-plugin-hyprexpo gnome-system-monitor
+        $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako hyprland-plugin-hyprexpo gnome-system-monitor evince
     fi
     
     print_status "Setting up UltraCandy configuration..."
