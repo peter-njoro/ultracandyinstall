@@ -3734,6 +3734,11 @@ windowrule = float,class:(org.gnome.Weather)
 windowrule = size 700 600,class:(org.gnome.Weather)
 windowrule = move 25% 10%-,class:(org.gnome.Weather)
 windowrule = pin,class:(org.gnome.Weather)
+# Calendar
+windowrule = float,class:(org.gnome.Calendar)
+windowrule = size 820 600,class:(org.gnome.Calendar)
+windowrule = center,class:(org.gnome.Calendar)
+windowrule = pin,class:(org.gnome.Calendar)
 # Files
 windowrule = float,title:(Open Files)
 windowrule = size 700 600,title:(Open Files)
@@ -4300,6 +4305,11 @@ windowrule = float,class:(org.gnome.Weather)
 windowrule = size 700 600,class:(org.gnome.Weather)
 windowrule = move 25% 10%-,class:(org.gnome.Weather)
 windowrule = pin,class:(org.gnome.Weather)
+# Calendar
+windowrule = float,class:(org.gnome.Calendar)
+windowrule = size 820 600,class:(org.gnome.Calendar)
+windowrule = center,class:(org.gnome.Calendar)
+windowrule = pin,class:(org.gnome.Calendar)
 # Files
 windowrule = float,title:(Open Files)
 windowrule = size 700 600,title:(Open Files)
