@@ -575,7 +575,7 @@ setup_fish() {
         # Create Starship config
         mkdir -p "$HOME/.config"
         cat > "$HOME/.config/starship.toml" << 'EOF'
-# Starship Configuration for HyprCandy
+# Starship Configuration for UltraCandy
 format = """
 $username\
 $hostname\
@@ -601,6 +601,12 @@ $character"""
 [fill]
 symbol = " "
 
+[username]
+style_user = "bold blue"
+style_root = "bold red"
+format = "[󱞬](blue) [](green) [$user](blue) [](green) ($style)"
+show_always = true
+
 [directory]
 style = "blue"
 read_only = " 🔒"
@@ -608,9 +614,9 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[󱞪 ](green)"
-error_symbol = "[󱞪 x](red)"
-vimcmd_symbol = "[󱞪 ❮](green)"
+success_symbol = "[󱞪](blue) [](green)"
+error_symbol = "[󱞪](blue) [x](red)"
+vimcmd_symbol = "[󱞪](blue) [❮](green)"
 
 [git_branch]
 symbol = "🌱 "
@@ -785,6 +791,12 @@ $character"""
 [fill]
 symbol = " "
 
+[username]
+style_user = "bold blue"
+style_root = "bold red"
+format = "[󱞬](blue) [](green) [$user](blue) [](green) ($style)"
+show_always = true
+
 [directory]
 style = "blue"
 read_only = " 🔒"
@@ -792,9 +804,9 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[󱞪 ](green)"
-error_symbol = "[󱞪 x](red)"
-vimcmd_symbol = "[󱞪 ❮](green)"
+success_symbol = "[󱞪](blue) [](green)"
+error_symbol = "[󱞪](blue) [x](red)"
+vimcmd_symbol = "[󱞪](blue) [❮](green)"
 
 [git_branch]
 symbol = "🌱 "
