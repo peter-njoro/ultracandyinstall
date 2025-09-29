@@ -950,11 +950,11 @@ setup_ultracandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER --noconfirm -S waybar waypaper-git swaync hyprland-plugin-hyprexpo gnome-system-monitor evince
+        $AUR_HELPER --noconfirm -S waybar waypaper-git swaync hyprland-plugin-hyprexpo gnome-calendar gnome-system-monitor evince
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako hyprland-plugin-hyprexpo gnome-system-monitor evince
+        $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako hyprland-plugin-hyprexpo gnome-calendar gnome-system-monitor evince
     fi
     
     print_status "Setting up UltraCandy configuration..."
@@ -11823,6 +11823,13 @@ main() {
     # Choose a panel
     choose_panel
     echo
+    
+    print_status "Setting up shell configuration..."
+    if [ "$SHELL_CHOICE" = "fish" ]; then
+        setup_fish
+    elif [ "$SHELL_CHOICE" = "zsh" ]; then
+        setup_zsh
+    fi
     
     # Check for AUR helper or install one
     check_or_install_aur_helper
