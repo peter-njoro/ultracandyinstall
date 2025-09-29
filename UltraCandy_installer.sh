@@ -3752,6 +3752,11 @@ windowrule = float,class:(org.gnome.Calendar)
 windowrule = size 820 600,class:(org.gnome.Calendar)
 windowrule = center,class:(org.gnome.Calendar)
 windowrule = pin,class:(org.gnome.Calendar)
+# System Monitor
+windowrule = float,class:(org.gnome.SystemMonitor)
+windowrule = size 820 660,class:(org.gnome.SystemMonitor)
+windowrule = center,class:(org.gnome.SystemMonitor)
+windowrule = pin,class:(org.gnome.SystemMonitor)
 # Files
 windowrule = float,title:(Open Files)
 windowrule = size 700 600,title:(Open Files)
@@ -4323,6 +4328,11 @@ windowrule = float,class:(org.gnome.Calendar)
 windowrule = size 820 600,class:(org.gnome.Calendar)
 windowrule = center,class:(org.gnome.Calendar)
 windowrule = pin,class:(org.gnome.Calendar)
+# System Monitor
+windowrule = float,class:(org.gnome.SystemMonitor)
+windowrule = size 820 660,class:(org.gnome.SystemMonitor)
+windowrule = center,class:(org.gnome.SystemMonitor)
+windowrule = pin,class:(org.gnome.SystemMonitor)
 # Files
 windowrule = float,title:(Open Files)
 windowrule = size 700 600,title:(Open Files)
