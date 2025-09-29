@@ -949,11 +949,11 @@ setup_ultracandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S waybar waypaper-git swaync hyprland-plugin-hyprexpo
+        $AUR_HELPER -S waybar waypaper-git swaync hyprland-plugin-hyprexpo gnome-system-monitor
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S ags-hyprpanel-git mako hyprland-plugin-hyprexpo
+        $AUR_HELPER -S ags-hyprpanel-git mako hyprland-plugin-hyprexpo gnome-system-monitor
     fi
     
     print_status "Setting up UltraCandy configuration..."
@@ -3770,6 +3770,11 @@ windowrule = float,class:(org.gnome.Calendar)
 windowrule = size 820 600,class:(org.gnome.Calendar)
 windowrule = center,class:(org.gnome.Calendar)
 windowrule = pin,class:(org.gnome.Calendar)
+# System Monitor
+windowrule = float,class:(org.gnome.SystemMonitor)
+windowrule = size 820 660,class:(org.gnome.SystemMonitor)
+windowrule = center,class:(org.gnome.SystemMonitor)
+windowrule = pin,class:(org.gnome.SystemMonitor)
 # Files
 windowrule = float,title:(Open Files)
 windowrule = size 700 600,title:(Open Files)
@@ -4341,6 +4346,11 @@ windowrule = float,class:(org.gnome.Calendar)
 windowrule = size 820 600,class:(org.gnome.Calendar)
 windowrule = center,class:(org.gnome.Calendar)
 windowrule = pin,class:(org.gnome.Calendar)
+# System Monitor
+windowrule = float,class:(org.gnome.SystemMonitor)
+windowrule = size 820 660,class:(org.gnome.SystemMonitor)
+windowrule = center,class:(org.gnome.SystemMonitor)
+windowrule = pin,class:(org.gnome.SystemMonitor)
 # Files
 windowrule = float,title:(Open Files)
 windowrule = size 700 600,title:(Open Files)
