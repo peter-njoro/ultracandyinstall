@@ -270,6 +270,7 @@ build_package_list() {
         # GNOME components (always include gnome-control-center and gnome-tweaks)
         "gnome-session"
         "gnome-control-center"
+        "gnome-system-monitor"
         "gnome-calendar"
         "gnome-tweaks"
         "gnome-weather"
