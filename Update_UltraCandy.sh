@@ -278,6 +278,7 @@ build_package_list() {
         "gnome-software"
         "gnome-calculator"
         "gnome-terminal"
+        "extension-manager"
         "evince"
 
         # Flatpak base repo for Gnome Software app
