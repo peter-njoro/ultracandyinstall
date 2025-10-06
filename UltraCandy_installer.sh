@@ -4051,24 +4051,24 @@ misc {
 # ┃                            Plugins                          ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-#plugin = /usr/lib/libhyprexpo.so
+plugin = /usr/lib/libhyprexpo.so
 
-#plugin {
-#    hyprexpo {
-#        columns = 3
-#        gap_size = 8
-#        bg_col = $inverse_primary
-#        workspace_method = center current
+plugin {
+    hyprexpo {
+        columns = 3
+        gap_size = 8
+        bg_col = $inverse_primary
+        workspace_method = center current
         
-#        enable_gesture = true
-#        gesture_fingers = 3
-#        gesture_distance = 250
-#        gesture_positive = true
+        enable_gesture = true
+        gesture_fingers = 3
+        gesture_distance = 250
+        gesture_positive = true
         
-#        workspace_scale = 0.6
-#        border_size = 2
-#    }
-#}
+        workspace_scale = 0.6
+        border_size = 2
+    }
+}
 EOF
 
 else  
@@ -4626,24 +4626,24 @@ misc {
 # ┃                            Plugins                          ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-#plugin = /usr/lib/libhyprexpo.so
+plugin = /usr/lib/libhyprexpo.so
 
-#plugin {
-#    hyprexpo {
-#        columns = 3
-#        gap_size = 8
-#        bg_col = $inverse_primary
-#        workspace_method = center current
+plugin {
+    hyprexpo {
+        columns = 3
+        gap_size = 8
+        bg_col = $inverse_primary
+        workspace_method = center current
         
-#        enable_gesture = true
-#        gesture_fingers = 3
-#        gesture_distance = 250
-#        gesture_positive = true
+        enable_gesture = true
+        gesture_fingers = 3
+        gesture_distance = 250
+        gesture_positive = true
         
-#        workspace_scale = 0.6
-#        border_size = 2
-#    }
-#}
+        workspace_scale = 0.6
+        border_size = 2
+    }
+}
 EOF
 fi
 
@@ -4852,7 +4852,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 
 #### Actions ####
 
-#bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
+bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
 bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
@@ -5076,7 +5076,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 
 #### Actions ####
 
-#bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
+bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
 bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
