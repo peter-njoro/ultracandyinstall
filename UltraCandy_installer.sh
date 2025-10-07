@@ -305,7 +305,7 @@ build_package_list() {
         "pacman-contrib"
 
         # Application launchers and menus
-        "rofi-wayland"
+        "rofi"
         "rofi-emoji"
         "rofi-nerdy"
         
