@@ -4070,24 +4070,24 @@ misc {
 # ┃                            Plugins                          ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-plugin = /usr/lib/libhyprexpo.so
+#plugin = /usr/lib/libhyprexpo.so
 
-plugin {
-    hyprexpo {
-        columns = 3
-        gap_size = 8
-        bg_col = $inverse_primary
-        workspace_method = center current
-        
-        enable_gesture = true
-        gesture_fingers = 3
-        gesture_distance = 250
-        gesture_positive = true
-        
-        workspace_scale = 0.6
-        border_size = 2
-    }
-}
+#plugin {
+#    hyprexpo {
+#        columns = 3
+#        gap_size = 8
+#        bg_col = $inverse_primary
+#        workspace_method = center current
+#        
+#        enable_gesture = true
+#        gesture_fingers = 3
+#        gesture_distance = 250
+#        gesture_positive = true
+#        
+#        workspace_scale = 0.6
+#        border_size = 2
+#    }
+#}
 EOF
 
 else  
@@ -4645,24 +4645,24 @@ misc {
 # ┃                            Plugins                          ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-plugin = /usr/lib/libhyprexpo.so
+#plugin = /usr/lib/libhyprexpo.so
 
-plugin {
-    hyprexpo {
-        columns = 3
-        gap_size = 8
-        bg_col = $inverse_primary
-        workspace_method = center current
-        
-        enable_gesture = true
-        gesture_fingers = 3
-        gesture_distance = 250
-        gesture_positive = true
-        
-        workspace_scale = 0.6
-        border_size = 2
-    }
-}
+#plugin {
+#    hyprexpo {
+#        columns = 3
+#        gap_size = 8
+#        bg_col = $inverse_primary
+#        workspace_method = center current
+#        
+#        enable_gesture = true
+#        gesture_fingers = 3
+#        gesture_distance = 250
+#        gesture_positive = true
+#        
+#        workspace_scale = 0.6
+#        border_size = 2
+#    }
+#}
 EOF
 fi
 
