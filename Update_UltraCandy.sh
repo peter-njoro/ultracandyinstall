@@ -951,11 +951,11 @@ setup_ultracandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER --noconfirm -S waybar waypaper-git swaync hyprland-plugin-hyprexpo gnome-calendar gnome-system-monitor evince
+        $AUR_HELPER --noconfirm -S waybar waypaper-git swaync gnome-calendar gnome-system-monitor evince
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako hyprland-plugin-hyprexpo gnome-calendar gnome-system-monitor evince
+        $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako gnome-calendar gnome-system-monitor evince
     fi
     
     print_status "Setting up UltraCandy configuration..."
@@ -4871,7 +4871,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 
 #### Actions ####
 
-bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
+#bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
 bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
@@ -5095,7 +5095,7 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 
 #### Actions ####
 
-bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
+#bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo workspaces overview
 bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
