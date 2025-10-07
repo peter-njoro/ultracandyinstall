@@ -265,7 +265,7 @@ build_package_list() {
         "hyprutils"
         "hyprwayland-scanner"
         "xdg-desktop-portal-hyprland"
-        "hyprland-plugin-hyprexpo"
+        #"hyprland-plugin-hyprexpo"
         
         # GNOME components (always include gnome-control-center and gnome-tweaks)
         "mutter"
@@ -942,9 +942,9 @@ setup_ultracandy() {
 
     # Prevent notification daemon conflicts
     if [ "$PANEL_CHOICE" = "waybar" ]; then
-        $AUR_HELPER -R mako
+        $AUR_HELPER -R mako hyprland-plugin-hyprexpo
     else
-        $AUR_HELPER -R swaync
+        $AUR_HELPER -R swaync hyprland-plugin-hyprexpo
     fi
     
     # Add panel censtric apps
