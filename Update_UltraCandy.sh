@@ -4096,6 +4096,11 @@ misc {
 #        border_size = 2
 #    }
 #}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Userprefs                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+# [NOTE!!] Add you personal settings from here and incase of an update copy them to the new file once this is changed to a backup
 EOF
 
 else  
@@ -4679,6 +4684,11 @@ misc {
 #        border_size = 2
 #    }
 #}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Userprefs                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+# [NOTE!!] Add you personal settings from here and incase of an update copy them to the new file once this is changed to a backup
 EOF
 fi
 
