@@ -375,7 +375,7 @@ build_package_list() {
         "tela-circle-icon-theme-all"
         
         # Cursor themes
-        "bibata-cursor-theme"
+        "bibata-cursor-theme-bin"
         
         # Package management
         "octopi"
