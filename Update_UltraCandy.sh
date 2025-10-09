@@ -3797,6 +3797,14 @@ windowrule = float,title:(Save As)
 windowrule = size 700 600,title:(Save As)
 windowrule = move 25% 10%-,title:(Save As)
 windowrule = pin,title:(Save As)
+
+windowrule = float,title:(Select files to send)
+windowrule = size 700 600,title:(Select files to send)
+windowrule = move 25% 10%-,title:(Select files to send)
+windowrule = pin,title:(Select files to send)
+
+windowrule = float,title:(Bluetooth File Transfer)
+windowrule = pin,title:(Bluetooth File Transfer)
 # nwg-look
 windowrule = float,class:(nwg-look)
 windowrule = size 700 600,class:(nwg-look)
@@ -4373,6 +4381,14 @@ windowrule = float,title:(Save As)
 windowrule = size 700 600,title:(Save As)
 windowrule = move 25% 10%-,title:(Save As)
 windowrule = pin,title:(Save As)
+
+windowrule = float,title:(Select files to send)
+windowrule = size 700 600,title:(Select files to send)
+windowrule = move 25% 10%-,title:(Select files to send)
+windowrule = pin,title:(Select files to send)
+
+windowrule = float,title:(Bluetooth File Transfer)
+windowrule = pin,title:(Bluetooth File Transfer)
 # nwg-look
 windowrule = float,class:(nwg-look)
 windowrule = size 700 600,class:(nwg-look)
