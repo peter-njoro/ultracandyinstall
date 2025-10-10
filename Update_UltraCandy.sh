@@ -3542,8 +3542,8 @@ setup_custom_config() {
 # ┃                           Autostart                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-#Launch bar/panel
-exec-once = waybar &
+exec-once = hyprpm reload & #Reload plugin
+exec-once = waybar & #Launch bar/panel
 
 exec-once = systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE
 exec-once = systemctl --user start background-watcher #Watches for system background changes to update background.png
@@ -4215,8 +4215,8 @@ else
 # ┃                           Autostart                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-#Launch bar/panel
-exec-once = systemctl --user start hyprpanel
+exec-once = hyprpm reload & #Reload plugins
+exec-once = systemctl --user start hyprpanel #Launch bar/panel
 
 exec-once = systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE
 exec-once = systemctl --user start background-watcher #Watches for system background changes to update background.png
