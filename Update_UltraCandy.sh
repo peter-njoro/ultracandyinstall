@@ -942,21 +942,21 @@ setup_ultracandy() {
 
     # Prevent notification daemon conflicts
     if [ "$PANEL_CHOICE" = "waybar" ]; then
-        $AUR_HELPER -R mako hyprland-plugin-hyprexpo
+        $AUR_HELPER -R mako
     else
-        $AUR_HELPER -R swaync hyprland-plugin-hyprexpo
+        $AUR_HELPER -R swaync
     fi
     
     # Add panel censtric apps
-    if [ "$PANEL_CHOICE" = "waybar" ]; then
-        print_status "Ensuring necessary packages are installed"
-        echo
-        $AUR_HELPER --noconfirm -S waybar waypaper-git swaync gnome-calendar gnome-system-monitor evince
-    else
-        print_status "Ensuring necessary packages are installed"
-        echo
-        $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako gnome-calendar gnome-system-monitor evince
-    fi
+    #if [ "$PANEL_CHOICE" = "waybar" ]; then
+     #   print_status "Ensuring necessary packages are installed"
+      #  echo
+       # $AUR_HELPER --noconfirm -S waybar waypaper-git swaync gnome-calendar gnome-system-monitor evince
+    #else
+     #   print_status "Ensuring necessary packages are installed"
+      #  echo
+       # $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako gnome-calendar gnome-system-monitor evince
+    #fi
 
     print_status "Setting up hyprexpo-plus for wrokspace overview..."
 
