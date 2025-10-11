@@ -4899,7 +4899,7 @@ input-field {
     font_family = C059 Bold Italic
     fade_on_empty = false
     fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
-    placeholder_text = <i><span> Password</span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
+    placeholder_text = <i><span>✝        $USER      ✝</span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
     hide_input = false
     rounding = 40 # -1 means complete rounding (circle/oval)
     check_color = $rimary
@@ -4939,16 +4939,16 @@ label {
     color = $primary_fixed_dim
     font_size = 55
     font_family = C059 Bold Italic
-    position = 0, -75
+    position = 0, -150
     halign = center
     valign = top
     shadow_passes = 5
     shadow_size = 10
 }
 
-label {
+#label {
     monitor =
-    text = ✝      $USER    ✝ #  $USER
+    #text = ✝      $USER    ✝ #  $USER
     color = $primary_fixed_dim
     font_size = 20
     font_family = C059 Bold
