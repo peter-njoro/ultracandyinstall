@@ -951,11 +951,11 @@ setup_ultracandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER --noconfirm -S waybar waypaper-git swaync meson cpio
+        $AUR_HELPER --noconfirm -S waybar waypaper-git swaync meson cpio cmake
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako meson cpio
+        $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako meson cpio cmake
     fi
 
     print_status "Setting up hyprexpo-plus for wrokspace overview..."
