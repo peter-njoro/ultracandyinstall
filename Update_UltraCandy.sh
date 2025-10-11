@@ -961,7 +961,7 @@ setup_ultracandy() {
     print_status "Setting up hyprexpo-plus for wrokspace overview..."
 
     hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
-    hyprpm update
+    hyprpm update -f
     hyprpm enable hyprexpo-plus
     hyprpm disable hyprexpo
     hyprpm reload
