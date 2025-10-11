@@ -266,7 +266,7 @@ detect_distro() {
             PACKAGE_MANAGER="pikman"
             HYPRLAND_AVAILABLE=true
             ;;
-        fedora)
+        fedora|nobara)
             DISTRO_FAMILY="fedora"
             PACKAGE_MANAGER="dnf"
             HYPRLAND_AVAILABLE=true
