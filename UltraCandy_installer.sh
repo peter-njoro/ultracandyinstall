@@ -499,6 +499,7 @@ translate_package_name() {
                 "waypaper-git") echo "swaybg" ;;
                 "ags-hyprpanel-git") echo "" ;; # Not available
                 "brave-bin") echo "brave-browser" ;;
+                "matugen-bin") echo "matugen" ;;
                 "matugen-bin") echo "python3-material-color-utilities" ;;
                 "bibata-cursor-theme-bin") echo "bibata-cursor-theme" ;;
                 "sddm-sugar-candy-git") echo "" ;; # Not available (non-Arch uses GDM)
