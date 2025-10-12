@@ -5351,7 +5351,7 @@ input-field {
     #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
     invert_numlock = false # change color if numlock is off
     swap_font_color = false # see below
-    position = 0, 35
+    position = 0, 150
     halign = center
     valign = bottom
     shadow_passes = 10
@@ -5376,7 +5376,7 @@ label {
     monitor =
     #clock
     text = cmd[update:1000] echo "$TIME"
-    color = $primary_fixed_dim
+    color = $source_color
     font_size = 55
     font_family = C059 Bold Italic
     position = 0, -150
