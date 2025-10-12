@@ -531,7 +531,7 @@ translate_package_name() {
             esac
             ;;
             
-        fedora)
+        fedora|nobara)
             case "$pkg" in
                 # Fonts
                 "ttf-dejavu-sans-code") echo "dejavu-sans-mono-fonts" ;;
