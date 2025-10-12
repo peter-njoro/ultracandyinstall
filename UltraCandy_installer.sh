@@ -725,6 +725,7 @@ build_package_list() {
         "meson" 
         "cpio"
         "cmake"
+        "g++"
         
         # Fonts
         "ttf-dejavu-sans-code"
