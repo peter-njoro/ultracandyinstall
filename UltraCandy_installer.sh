@@ -4515,7 +4515,7 @@ plugin {
         gaps_in = 10
         gaps_out = 12
         bg_col = $inverse_primary
-        workspace_method = first 1
+        workspace = first 1
         
         #borders
         border_style = hyprland
@@ -5187,7 +5187,7 @@ plugin {
         gaps_in = 10
         gaps_out = 12
         bg_col = $inverse_primary
-        workspace_method = first 1
+        workspace = first 1
         
         #borders
         border_style = hyprland
