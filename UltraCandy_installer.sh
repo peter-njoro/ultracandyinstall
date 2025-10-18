@@ -3809,6 +3809,10 @@ windowrule = float, class:(hyprland-share-picker)
 windowrule = pin, class:(hyprland-share-picker)
 windowrule = center, title:class:(hyprland-share-picker)
 windowrule = size 600 400,class:(hyprland-share-picker)
+# Hyprland Settings App
+windowrule = float,title:(hyprviz)
+windowrule = size 1000 660,title:(hyprviz)
+windowrule = center,title:(hyprviz)
 # General floating
 windowrule = float,class:(dotfiles-floating)
 windowrule = size 1000 700,class:(dotfiles-floating)
@@ -4482,6 +4486,10 @@ windowrule = float, class:(hyprland-share-picker)
 windowrule = pin, class:(hyprland-share-picker)
 windowrule = center, title:class:(hyprland-share-picker)
 windowrule = size 600 400,class:(hyprland-share-picker)
+# Hyprland Settings App
+windowrule = float,title:(hyprviz)
+windowrule = size 1000 660,title:(hyprviz)
+windowrule = center,title:(hyprviz)
 # General floating
 windowrule = float,class:(dotfiles-floating)
 windowrule = size 1000 700,class:(dotfiles-floating)
