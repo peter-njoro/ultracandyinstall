@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # UltraCandy Installer Script
-# This script installs Hyprland and related packages across multiple distributions
+# This script installs Hyprland and related packages from AUR
 
 #set -e  # Exit on any error
 
@@ -25,12 +25,12 @@ DISPLAY_MANAGER_SERVICE=""
 SHELL_CHOICE=""
 PANEL_CHOICE=""
 BROWSER_CHOICE=""
-AUR_HELPER=""
 
 # Function to display multicolored ASCII art
 show_ascii_art() {
     clear
     echo
+    # UltraCandy in gradient colors
     echo -e "${PURPLE}██╗   ██╗██╗  ████████╗██████╗  ${MAGENTA}██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗${NC}"
     echo -e "${PURPLE}██║   ██║██║  ╚══██╔══╝██╔══██╗${MAGENTA}██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝${NC}"
     echo -e "${LIGHT_BLUE}██║   ██║██║     ██║   ██████╔╝${CYAN}██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝${NC}"
@@ -38,6 +38,7 @@ show_ascii_art() {
     echo -e "${BLUE}╚██████╔╝███████╗██║   ██║  ██║${LIGHT_GREEN}╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║${NC}"
     echo -e "${GREEN} ╚═════╝ ╚══════╝╚═╝   ╚═╝  ╚═╝${LIGHT_GREEN} ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝${NC}"
     echo
+    # Installer in different colors
     echo -e "${BLUE}██╗███╗   ██╗███████╗████████╗ ${LIGHT_RED}█████╗ ██╗     ██╗     ███████╗██████╗${NC}"
     echo -e "${BLUE}██║████╗  ██║██╔════╝╚══██╔══╝${LIGHT_RED}██╔══██╗██║     ██║     ██╔════╝██╔══██╗${NC}"
     echo -e "${RED}██║██╔██╗ ██║███████╗   ██║   ${LIGHT_RED}███████║██║     ██║     █████╗  ██████╔╝${NC}"
@@ -45,6 +46,7 @@ show_ascii_art() {
     echo -e "${LIGHT_RED}██║██║ ╚████║███████║   ██║   ${CYAN}██║  ██║███████╗███████╗███████╗██║  ██║${NC}"
     echo -e "${CYAN}╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝${NC}"
     echo
+    # Decorative line with gradient
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
     echo -e "${WHITE}                    Welcome to the UltraCandy Installer!${NC}"
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
@@ -70,111 +72,86 @@ print_error() {
 
 # Function to choose display manager
 choose_display_manager() {
-    if [ "$DISTRO_FAMILY" = "arch" ]; then
-        print_status "For old users: remove rofi-wayland through 'sudo pacman -Rnsd rofi-wayland' then clear cache through 'sudo pacman -Scc'"
-        echo -e "${CYAN}Choose your display manager:${NC}"
-        echo "1) SDDM with Sugar Candy theme (HyprCandy automatic background set according to applied wallpaper)"
-        echo "2) GDM with GDM settings app (GNOME Display Manager and customization app)"
-        echo
-        
-        while true; do
-            echo -e "${YELLOW}Enter your choice (1 for SDDM, 2 for GDM):${NC}"
-            read -r dm_choice
-            case $dm_choice in
-                1)
-                    DISPLAY_MANAGER="sddm"
-                    DISPLAY_MANAGER_SERVICE="sddm"
-                    print_status "Selected SDDM with Sugar Candy theme and HyprCandy automatic background setting"
-                    break
-                    ;;
-                2)
-                    DISPLAY_MANAGER="gdm"
-                    DISPLAY_MANAGER_SERVICE="gdm"
-                    print_status "Selected GDM with GDM settings app"
-                    break
-                    ;;
-                *)
-                    print_error "Invalid choice. Please enter 1 or 2."
-                    ;;
-            esac
-        done
-    else
-        # Non-Arch distributions use GDM by default
-        DISPLAY_MANAGER="gdm"
-        DISPLAY_MANAGER_SERVICE="gdm"
-        print_status "Using GDM (GNOME Display Manager) - default for $DISTRO_FAMILY"
-        print_status "GDM settings app will be installed for customization"
-    fi
+    print_status "For old users remove rofi-wayland through 'sudo pacman -Rnsd rofi-wayland' then clear cache through 'sudo pacman -Scc'"
+    echo -e "${CYAN}Choose your display manager:${NC}"
+    echo "1) SDDM with Sugar Candy theme (HyprCandy automatic background set according to applied wallpaper)"
+    echo "2) GDM with GDM settings app (GNOME Display Manager and customization app)"
+    echo
+    
+    while true; do
+        echo -e "${YELLOW}Enter your choice (1 for SDDM, 2 for GDM):${NC}"
+        read -r dm_choice
+        case $dm_choice in
+            1)
+                DISPLAY_MANAGER="sddm"
+                DISPLAY_MANAGER_SERVICE="sddm"
+                print_status "Selected SDDM with Sugar Candy theme and HyprCandy automatic background setting"
+                break
+                ;;
+            2)
+                DISPLAY_MANAGER="gdm"
+                DISPLAY_MANAGER_SERVICE="gdm"
+                print_status "Selected GDM with GDM settings app"
+                break
+                ;;
+            *)
+                print_error "Invalid choice. Please enter 1 or 2."
+                ;;
+        esac
+    done
 }
 
 choose_panel() {
-    if [ "$DISTRO_FAMILY" = "arch" ]; then
-        echo -e "${CYAN}Choose your panel (you can rerun the script to switch or regenerate UltraCandy's default panel setup):${NC}"
-        echo -e "${GREEN}1) Waybar${NC}"
-        echo "   • Light with fast startup/reload for a 'taskbar' like experience"
-        echo "   • Highly customizable manually"
-        echo "   • Waypaper integration: loads colors through waypaper backgrounds"
-        echo "   • Fast live wallpaper application through caching and easier background setup"
-        echo ""
-        echo -e "${GREEN}2) Hyprpanel${NC}"
-        echo "   • Easy to theme through its interface"
-        echo "   • Has an autohide feature when only one window is open"
-        echo "   • Much slower to relaunch after manually killing (when multiple windows are open)"
-        echo "   • Recommended for users who don't mind an always-on panel"
-        echo "   • Longer process to set backgrounds and slower for live backgrounds"
-        echo ""
-        
-        while true; do
-            read -rp "Enter 1 or 2: " panel_choice
-            case $panel_choice in
-                1) 
-                    PANEL_CHOICE="waybar"
-                    break
-                    ;;
-                2) 
-                    PANEL_CHOICE="hyprpanel"
-                    break
-                    ;;
-                *) 
-                    print_error "Invalid choice. Please enter 1 or 2."
-                    ;;
-            esac
-        done
-        echo -e "${GREEN}Panel selected: $PANEL_CHOICE${NC}"
-    else
-        # Non-Arch distributions use Waybar only
-        PANEL_CHOICE="waybar"
-        print_status "Using Waybar panel - optimized for $DISTRO_FAMILY compatibility"
-        print_warning "Hyprpanel is currently only available for Arch-based distributions"
-    fi
+    echo -e "${CYAN}Choose your panel: you can also rerun the script to switch from either or regenerate UltraCandy's default panel setup:${NC}"
+    echo -e "${GREEN}1) Waybar${NC}"
+    echo "   • Light with fast startup/reload for a 'taskbar' like experience"
+    echo "   • Highly customizable manually"
+    echo "   • Waypaper integration: loads colors through waypaper backgrounds"
+    echo "   • Fast live wallpaper application through caching and easier background setup"
+    echo ""
+    echo -e "${GREEN}2) Hyprpanel${NC}"
+    echo "   • Easy to theme through its interface"
+    echo "   • Has an autohide feature when only one window is open"
+    echo "   • Much slower to relaunch after manually killing (when multiple windows are open)"
+    echo "   • Recommended for users who don't mind an always-on panel"
+    echo "   • Longer process to set backgrounds and slower for live backgrounds"
+    echo ""
+    
+    read -rp "Enter 1 or 2: " panel_choice
+    case $panel_choice in
+        1) PANEL_CHOICE="waybar" ;;
+        2) PANEL_CHOICE="hyprpanel" ;;
+        *) 
+            print_error "Invalid choice. Please enter 1 or 2."
+            echo ""
+            choose_panel  # Recursively ask again
+            ;;
+    esac
+    echo -e "${GREEN}Panel selected: $PANEL_CHOICE${NC}"
 }
 
 choose_browser() {
     echo -e "${CYAN}Choose your browser:${NC}"
-        echo "1) Brave (Seamless integration with UltraCandy GTK and Qt theme, fast, secure and privacy-focused)"
-        echo "2) Firefox (Themed through python-pywalfox by running 'pywalfox update', open-source and privacy-focused)"
-        echo "3) Zen Browser (Themed through zen mods and python-pywalfox, open-source and privacy-focused)"
-        echo "4) Librewolf (Open-source browser with a focus on privacy, highly customizable manually)"
-        echo "5) Other (Install your own browser post-installation)"
-        
-        while true; do
-            read -rp "Enter 1, 2, 3, 4 or 5: " browser_choice
-            case $browser_choice in
-                1) BROWSER_CHOICE="brave"; break ;;
-                2) BROWSER_CHOICE="firefox"; break ;;
-                3) BROWSER_CHOICE="zen-browser-bin"; break ;;
-                4) BROWSER_CHOICE="librewolf"; break ;;
-                5) BROWSER_CHOICE="other"; break ;;
-                *) print_error "Invalid choice. Please enter 1, 2, 3, 4 or 5." ;;
-            esac
-        done
-    
+    echo "1) Brave (Seemless integration with UltraCandy GTK and Qt theme through its Appearance settings, fast, secure and privacy-focused browser)"
+    echo "2) Firefox (Themed through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
+    echo "3) Zen Browser (Themed through zen mods and slightly through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
+    echo "4) Librewolf (Open-source browser with a focus on privacy, highly customizable manually)"
+    echo "5) Other (Please install your own browser post-installation)"
+    read -rp "Enter 1, 2, 3, 4 or 5: " browser_choice
+    case $browser_choice in
+        1) BROWSER_CHOICE="brave" ;;
+        2) BROWSER_CHOICE="firefox" ;;
+        3) BROWSER_CHOICE="zen-browser-bin" ;;
+        4) BROWSER_CHOICE="librewolf" ;;
+        5) BROWSER_CHOICE="Other" ;;
+        *) print_error "Invalid choice. Please enter 1, 2, 3, 4 or 5." ;;
+    esac
     echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
 }
 
 # Function to choose shell
 choose_shell() {
-    echo -e "${CYAN}Choose your shell (you can rerun the script to switch or regenerate UltraCandy's default shell setup):${NC}"
+    echo -e "${CYAN}Choose your shell: you can also rerun the script to switch from either or regenerate UltraCandy's default shell setup:${NC}"
     echo "1) Fish - A modern shell with builtin fzf search, intelligent autosuggestions and syntax highlighting (Fisher plugins + Starship prompt)"
     echo "2) Zsh - Powerful shell with extensive customization (Zsh plugins + Oh My Zsh + Starship prompt)"
     echo
@@ -203,91 +180,90 @@ choose_shell() {
 # Function to install yay
 install_yay() {
     print_status "Installing yay..."
-    local temp_dir=$(mktemp -d)
-    cd "$temp_dir"
+    cd /tmp
     git clone https://aur.archlinux.org/yay.git
     cd yay
     makepkg -si --noconfirm
-    cd /
-    rm -rf "$temp_dir"
+    cd /tmp
+    rm -rf yay
     print_success "yay installed successfully!"
 }
 
 # Function to install paru
 install_paru() {
     print_status "Installing paru..."
-    local temp_dir=$(mktemp -d)
-    cd "$temp_dir"
+    cd /tmp
     git clone https://aur.archlinux.org/paru.git
     cd paru
     makepkg -si --noconfirm
-    cd /
-    rm -rf "$temp_dir"
+    cd /tmp
+    rm -rf paru
     print_success "paru installed successfully!"
 }
 
-# Function to check or install appropriate package manager
-check_or_install_package_manager() {
-    print_status "Setting up package manager"
-            if command -v yay >/dev/null 2>&1; then
-                AUR_HELPER="yay"
-                print_success "yay is already installed"
-            elif command -v paru >/dev/null 2>&1; then
-                AUR_HELPER="paru"
-                print_success "paru is already installed"
-            else
-                print_status "No AUR helper found. Choose one to install:"
-                echo "1) paru (default, recommended)"
-                echo "2) yay"
-                
-                while true; do
-                    read -p "Enter your choice (1-2): " choice
-                    case $choice in
-                        1|"")
-                            print_status "Ensuring base-devel and git are installed..."
-                            sudo pacman -S --needed --noconfirm base-devel git
-                            install_paru
-                            AUR_HELPER="paru"
-                            break
-                            ;;
-                        2)
-                            print_status "Ensuring base-devel and git are installed..."
-                            sudo pacman -S --needed --noconfirm base-devel git
-                            install_yay
-                            AUR_HELPER="yay"
-                            break
-                            ;;
-                        *)
-                            print_error "Invalid choice. Please enter 1 or 2."
-                            ;;
-                    esac
-                done
-            fi
+# Check if AUR helper is installed or install one
+check_or_install_aur_helper() {
+    if command -v yay &> /dev/null; then
+        AUR_HELPER="yay"
+        print_status "Found yay - using as AUR helper"
+    elif command -v paru &> /dev/null; then
+        AUR_HELPER="paru"
+        print_status "Found paru - using as AUR helper"
+    else
+        print_warning "No AUR helper found. You need to install one."
+        echo
+        echo "Available AUR helpers:"
+        echo "1) yay - Yet Another Yogurt (Go-based, fast)"
+        echo "2) paru - Paru is based on yay (Rust-based, feature-rich)"
+        echo
+        while true; do
+            echo -e "${YELLOW}Choose which AUR helper to install (1 for yay, 2 for paru):${NC}"
+            read -r choice
+            case $choice in
+                1)
+                    # Check if base-devel and git are installed
+                    print_status "Ensuring base-devel and git are installed..."
+                    sudo pacman -S --needed --noconfirm base-devel git
+                    install_yay
+                    AUR_HELPER="yay"
+                    break
+                    ;;
+                2)
+                    # Check if base-devel and git are installed
+                    print_status "Ensuring base-devel and git are installed..."
+                    sudo pacman -S --needed --noconfirm base-devel git
+                    install_paru
+                    AUR_HELPER="paru"
+                    break
+                    ;;
+                *)
+                    print_error "Invalid choice. Please enter 1 or 2."
+                    ;;
+            esac
+        done
+    fi
 }
 
-# Function to build package list
+# Function to build package list based on display manager choice
 build_package_list() {
-    # Initialize the main package array
     packages=(
         # Hyprland ecosystem
         "hyprland"
         "hyprcursor"
-        "hyprpaper"
-        "hyprpicker"
-        "xdg-desktop-portal-hyprland"
+        "hyprgraphics"
         "hypridle"
-        "hyprlock"
         "hyprland-protocols"
         "hyprland-qt-support"
         "hyprland-qtutils"
         "hyprlang"
+        "hyprlock"
+        "hyprpaper"
+        "hyprpicker"
         "hyprpolkitagent"
         "hyprsunset"
         "hyprsysteminfo"
         "hyprutils"
         "hyprwayland-scanner"
-        "hyprgraphics"
-        "hyprviz-bin"
         
         # Packages
         "pacman-contrib"
@@ -298,20 +274,11 @@ build_package_list() {
         "cpio" 
         "cmake"
         
-        # GNOME components
-        "mutter"
-        "gnome-session"
+        # GNOME components (always include gnome-control-center and gnome-tweaks)
         "gnome-control-center"
-        "gnome-system-monitor"
-        "gnome-calendar"
         "gnome-tweaks"
-        "gnome-weather"
         "gnome-software"
-        "gnome-calculator"
-        "gnome-terminal"
-        "extension-manager"
-        "evince"
-        "flatpak"
+        "mutter"
         
         # Terminals and file manager
         "kitty"
@@ -323,17 +290,14 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
-        "power-profiles-daemon"
-        "bluez"
-        "bluez-utils"
+        "network-manager-applet"
         "blueman"
         "nwg-displays"
-        "nwg-dock-hyprland"
         "wlogout"
         "uwsm"
         
         # Application launchers and menus
-        "rofi"
+        "rofi-wayland"
         "rofi-emoji"
         "rofi-nerdy"
         
@@ -349,6 +313,14 @@ build_package_list() {
         "gnome-disk-utility"
         "brightnessctl"
         "playerctl"
+        "power-profiles-daemon"
+        
+        # Audio system
+        "pipewire"
+        "pipewire-pulse"
+        "pipewire-alsa"
+        "pipewire-jack"
+        "alsa-utils"
         
         # System monitoring
         "btop"
@@ -357,6 +329,8 @@ build_package_list() {
         
         # Customization and theming
         "matugen-bin"
+        "python-pywal16"
+        "quickshell"
         
         # Editors
         "gedit"
@@ -376,11 +350,13 @@ build_package_list() {
         "inotify-tools"
         "bc"
         "libnotify"
-        "jq"
+
+        # Fallback notification daemon (when hyprpanel isn't running)
+        "mako"
         
-        # Fonts
+        # Fonts and emojis
         "ttf-dejavu-sans-code"
-        "ttf-cascadia-code-nerd"
+        "ttf-cascadia-mono-nerd"
         "ttf-fantasque-nerd"
         "ttf-firacode-nerd"
         "ttf-jetbrains-mono-nerd"
@@ -395,54 +371,55 @@ build_package_list() {
         
         # Clipboard
         "cliphist"
+        "python-pywalfox"
         
-        # Theming
+        # Browser and themes
+        "firefox"
         "adw-gtk-theme"
         "adwaita-qt6"
         "adwaita-qt-git"
         "tela-circle-icon-theme-all"
-        "bibata-cursor-theme-bin"
+        
+        # Cursor themes
+        "bibata-cursor-theme"
+        
+        # Package management
+        "octopi"
         
         # System info
         "fastfetch"
         
-        # GTK libraries
+        # GTK development libraries
         "gtkmm-4.0"
         "gtksourceview3"
         "gtksourceview4"
         "gtksourceview5"
-        
+
         # Fun stuff
         "cmatrix"
         "pipes.sh"
-        "asciiquarium"
-        "tty-clock"
         
         # Configuration management
         "stow"
-        
-        # Extra
-        "spotify"
-        "equibop-bin"
     )
     
-    # Add display manager packages
+    # Add display manager specific packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         packages+=("sddm" "sddm-sugar-candy-git")
-        print_status "Added SDDM to package list"
+        print_status "Added SDDM and Sugar Candy theme to package list"
     elif [ "$DISPLAY_MANAGER" = "gdm" ]; then
         packages+=("gdm" "gdm-settings")
-        print_status "Added GDM to package list"
+        print_status "Added GDM and GDM settings to package list"
     fi
     
-    # Add shell packages
+    # Add shell specific packages
     if [ "$SHELL_CHOICE" = "fish" ]; then
         packages+=(
             "fish"
             "fisher"
             "starship"
         )
-        print_status "Added Fish shell to package list"
+        print_status "Added Fish shell and modern tools to package list"
     elif [ "$SHELL_CHOICE" = "zsh" ]; then
         packages+=(
             "zsh"
@@ -453,42 +430,53 @@ build_package_list() {
             "starship"
             "oh-my-zsh-git"
         )
-        print_status "Added Zsh to package list"
+        print_status "Added Zsh and Oh My Zsh ecosystem with Starship to package list"
     fi
     
-    # Add panel packages (Waybar for all, Hyprpanel only for Arch)
+    
+    # Add panel based on user choice
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         packages+=(
-            "waybar"
-            "waypaper-git"
-            "swaync"
+        "waybar"
+        "waypaper-git"
+        "swaync"
         )
         print_status "Added Waybar to package list"
     else
-        # Hyprpanel (Arch only)
         packages+=(
-            "ags-hyprpanel-git"
-            "mako"
+        "ags-hyprpanel-git"
+        "mako"
         )
         print_status "Added Hyprpanel to package list"
     fi
-    
-    # Add browser packages
+
+    # Add browser based on user choice
     if [ "$BROWSER_CHOICE" = "brave" ]; then
-        packages+=("brave-bin")
+        packages+=(
+            "brave-bin"
+        )
         print_status "Added Brave to package list"
     elif [ "$BROWSER_CHOICE" = "firefox" ]; then
-        packages+=("firefox" "python-pywalfox")
+        packages+=(
+            "firefox"
+            "python-pywalfox"
+        )
         print_status "Added Firefox to package list"
     elif [ "$BROWSER_CHOICE" = "zen-browser-bin" ]; then
-        packages+=("zen-browser-bin" "python-pywalfox")
+        packages+=(
+            "zen-browser-bin"
+            "python-pywalfox"
+        )
         print_status "Added Zen Browser to package list"
     elif [ "$BROWSER_CHOICE" = "librewolf" ]; then
-        packages+=("librewolf" "python-pywalfox")
+        packages+=(
+            "librewolf"
+            "python-pywalfox"
+        )
         print_status "Added Librewolf to package list"
+    elif [ "$BROWSER_CHOICE" = "Other" ]; then
+        print_status "Please install your own browser post-installation"
     fi
-    
-    print_success "Package list built with ${#packages[@]} packages"
 }
 
 # Function to install packages
