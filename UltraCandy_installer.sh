@@ -1382,8 +1382,9 @@ EOF
 # Function to automatically setup Hyprcandy configuration
 setup_ultracandy() {
 
-    print_status "Setting up hyprexpo-plus for workspace overview..."
-    
+    print_status "Setting up hyprexpo-plus for wrokspace overview..."
+
+    hyprpm update
     hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
     hyprpm update
     hyprpm enable hyprexpo-plus
