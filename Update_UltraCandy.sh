@@ -25,15 +25,7 @@ DISPLAY_MANAGER_SERVICE=""
 SHELL_CHOICE=""
 PANEL_CHOICE=""
 BROWSER_CHOICE=""
-DISTRO=""
-DISTRO_FAMILY=""
-PACKAGE_MANAGER=""
-HYPRLAND_AVAILABLE=false
 AUR_HELPER=""
-
-# Package arrays
-declare -a packages
-declare -a hyprland_core
 
 # Function to display multicolored ASCII art
 show_ascii_art() {
@@ -159,8 +151,6 @@ choose_panel() {
 
 choose_browser() {
     echo -e "${CYAN}Choose your browser:${NC}"
-    
-    if [ "$DISTRO_FAMILY" = "arch" ]; then
         echo "1) Brave (Seamless integration with UltraCandy GTK and Qt theme, fast, secure and privacy-focused)"
         echo "2) Firefox (Themed through python-pywalfox by running 'pywalfox update', open-source and privacy-focused)"
         echo "3) Zen Browser (Themed through zen mods and python-pywalfox, open-source and privacy-focused)"
@@ -178,22 +168,6 @@ choose_browser() {
                 *) print_error "Invalid choice. Please enter 1, 2, 3, 4 or 5." ;;
             esac
         done
-    else
-        echo "1) Brave (Seamless integration with UltraCandy GTK and Qt theme, fast, secure and privacy-focused)"
-        echo "2) Firefox (Themed through python-pywalfox by running 'pywalfox update', open-source and privacy-focused)"
-        echo "3) Other (Install your own browser post-installation)"
-        print_warning "Note: Zen Browser and Librewolf are only available on Arch-based distributions"
-        
-        while true; do
-            read -rp "Enter 1, 2, or 3: " browser_choice
-            case $browser_choice in
-                1) BROWSER_CHOICE="brave"; break ;;
-                2) BROWSER_CHOICE="firefox"; break ;;
-                3) BROWSER_CHOICE="other"; break ;;
-                *) print_error "Invalid choice. Please enter 1, 2, or 3." ;;
-            esac
-        done
-    fi
     
     echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
 }
@@ -226,133 +200,6 @@ choose_shell() {
     done
 }
 
-# Function to detect distribution and set package manager
-detect_distro() {
-    if [ ! -f /etc/os-release ]; then
-        print_error "Cannot detect distribution - /etc/os-release not found"
-        exit 1
-    fi
-    
-    . /etc/os-release
-    DISTRO="$ID"
-    
-    case "$ID" in
-        arch|manjaro|cachyos|endeavouros|artix|garuda)
-            DISTRO_FAMILY="arch"
-            PACKAGE_MANAGER="pacman"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        ubuntu|debian)
-            DISTRO_FAMILY="debian"
-            PACKAGE_MANAGER="apt"
-            if [ "$ID" = "ubuntu" ] && [ "${VERSION_ID%%.*}" -ge 23 ]; then
-                HYPRLAND_AVAILABLE=true
-            elif [ "$ID" = "debian" ]; then
-                # Check for backports
-                if grep -q "^deb.*backports" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
-                    HYPRLAND_AVAILABLE=true
-                else
-                    HYPRLAND_AVAILABLE=false
-                fi
-            fi
-            ;;
-        pop)
-            DISTRO_FAMILY="debian"
-            PACKAGE_MANAGER="apt"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        pikaos)
-            DISTRO_FAMILY="debian"
-            PACKAGE_MANAGER="pikman"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        fedora|nobara)
-            DISTRO_FAMILY="fedora"
-            PACKAGE_MANAGER="dnf"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        opensuse-tumbleweed)
-            DISTRO_FAMILY="suse"
-            PACKAGE_MANAGER="zypper"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        *)
-            DISTRO_FAMILY="unknown"
-            PACKAGE_MANAGER="unknown"
-            HYPRLAND_AVAILABLE=false
-            ;;
-    esac
-    
-    print_status "Detected distribution: $DISTRO ($DISTRO_FAMILY)"
-    print_status "Package manager: $PACKAGE_MANAGER"
-    
-    if [ "$HYPRLAND_AVAILABLE" = true ]; then
-        print_success "Hyprland is available for your distribution"
-    else
-        print_error "Hyprland is not officially supported on your distribution"
-        print_warning "You may need to build from source or use an unofficial repository"
-        read -p "Do you want to continue anyway? (y/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
-        fi
-    fi
-}
-
-# Function to setup distribution-specific repositories
-setup_repos() {
-    print_status "Setting up repositories for $DISTRO_FAMILY..."
-    
-    case "$DISTRO_FAMILY" in
-        debian)
-            # Add Hyprland repository for Ubuntu 23+
-            if [ "$DISTRO" = "ubuntu" ] && [ "${VERSION_ID%%.*}" -ge 23 ]; then
-                if ! grep -q "hyprland" /etc/apt/sources.list.d/* 2>/dev/null; then
-                    print_status "Adding Hyprland PPA..."
-                    sudo add-apt-repository -y ppa:hyprland/hyprland
-                fi
-            fi
-            
-            # Setup Flatpak
-            if ! command -v flatpak >/dev/null 2>&1; then
-                print_status "Installing Flatpak..."
-                sudo apt install -y flatpak
-                sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-            fi
-            
-            sudo apt update
-            ;;
-            
-        fedora)
-            # Add COPR for Hyprland
-            if ! dnf copr list 2>/dev/null | grep -q "solopasha/hyprland"; then
-                print_status "Adding Hyprland COPR..."
-                sudo dnf copr enable -y solopasha/hyprland
-            fi
-            
-            # Enable RPM Fusion
-            if ! dnf repolist 2>/dev/null | grep -q "rpmfusion"; then
-                print_status "Enabling RPM Fusion repositories..."
-                sudo dnf install -y \
-                    https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-                    https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-            fi
-            
-            sudo dnf update -y
-            ;;
-            
-        suse)
-            if ! zypper lr 2>/dev/null | grep -q "hyprland"; then
-                print_status "Adding Hyprland repository..."
-                sudo zypper ar -f https://download.opensuse.org/repositories/home:/jmattheis:/hyprland/openSUSE_Tumbleweed/home:jmattheis:hyprland.repo
-            fi
-            sudo zypper refresh
-            ;;
-    esac
-    
-    print_success "Repositories configured"
-}
-
 # Function to install yay
 install_yay() {
     print_status "Installing yay..."
@@ -381,10 +228,7 @@ install_paru() {
 
 # Function to check or install appropriate package manager
 check_or_install_package_manager() {
-    print_status "Setting up package manager for $DISTRO..."
-    
-    case "$DISTRO_FAMILY" in
-        arch)
+    print_status "Setting up package manager"
             if command -v yay >/dev/null 2>&1; then
                 AUR_HELPER="yay"
                 print_success "yay is already installed"
@@ -419,205 +263,13 @@ check_or_install_package_manager() {
                     esac
                 done
             fi
-            ;;
-            
-        debian)
-            if [ "$DISTRO" = "pikaos" ]; then
-                if ! command -v pikman >/dev/null 2>&1; then
-                    print_status "Installing pikman..."
-                    curl -s https://raw.githubusercontent.com/PikaOS-Linux/pikman/main/install.sh | sudo bash
-                fi
-            else
-                print_status "Updating package lists..."
-                sudo apt-get update
-                print_status "Installing essential build tools..."
-                sudo apt-get install -y build-essential git
-            fi
-            ;;
-            
-        fedora)
-            print_status "Updating DNF and installing development tools..."
-            sudo dnf upgrade -y
-            sudo dnf groupinstall -y "Development Tools"
-            sudo dnf install -y git
-            ;;
-            
-        suse)
-            print_status "Updating zypper and installing development tools..."
-            sudo zypper refresh
-            sudo zypper install -y -t pattern devel_basis
-            sudo zypper install -y git
-            ;;
-            
-        *)
-            print_error "Unsupported distribution family: $DISTRO_FAMILY"
-            exit 1
-            ;;
-    esac
-}
-
-# Function to translate package names based on distribution
-translate_package_name() {
-    local pkg="$1"
-    
-    case "$DISTRO_FAMILY" in
-        arch)
-            # Arch uses original names
-            echo "$pkg"
-            ;;
-            
-        debian)
-            case "$pkg" in
-                # Hyprland ecosystem
-                "hyprland") echo "hyprland" ;;
-                "hyprcursor") echo "hyprcursor" ;;
-                "hypridle") echo "hypridle" ;;
-                "hyprland-protocols") echo "hyprland-protocols" ;;
-                "hyprlock") echo "hyprlock" ;;
-                "hyprpaper") echo "hyprpaper" ;;
-                "hyprpicker") echo "hyprpicker" ;;
-                "hyprpolkitagent") echo "hyprland-polkit-agent" ;;
-                "xdg-desktop-portal-hyprland") echo "xdg-desktop-portal-hyprland" ;;
-                
-                # GNOME components
-                "extension-manager") echo "gnome-shell-extension-manager" ;;
-                
-                # Fonts
-                "ttf-dejavu-sans-code") echo "fonts-dejavu" ;;
-                "ttf-cascadia-code-nerd") echo "fonts-cascadia-code" ;;
-                "ttf-fantasque-nerd") echo "fonts-fantasque-sans" ;;
-                "ttf-firacode-nerd") echo "fonts-firacode" ;;
-                "ttf-jetbrains-mono-nerd") echo "fonts-jetbrains-mono" ;;
-                "ttf-nerd-fonts-symbols"|"ttf-nerd-fonts-symbols-common"|"ttf-nerd-fonts-symbols-mono") echo "fonts-nerd-font-hack" ;;
-                "ttf-meslo-nerd") echo "fonts-meslo-nerd" ;;
-                "powerline-fonts") echo "fonts-powerline" ;;
-                "noto-fonts-emoji"|"noto-color-emoji-fontconfig") echo "fonts-noto-color-emoji" ;;
-                "awesome-terminal-fonts") echo "fonts-font-awesome" ;;
-                
-                # AUR packages that need alternatives or are unavailable
-                "grimblast-git") echo "grim" ;;
-                "waypaper-git") echo "swaybg" ;;
-                "ags-hyprpanel-git") echo "" ;; # Not available
-                "brave-bin") echo "brave-browser" ;;
-                "matugen-bin") echo "python3-material-color-utilities" ;;
-                "bibata-cursor-theme-bin") echo "bibata-cursor-theme" ;;
-                "sddm-sugar-candy-git") echo "" ;; # Not available (non-Arch uses GDM)
-                "oh-my-zsh-git") echo "zsh-oh-my-zsh" ;;
-                "zen-browser-bin") echo "" ;; # Not available
-                "fisher") echo "" ;; # Install via Fish
-                "equibop-bin") echo "" ;; # Not available
-                "downgrade") echo "" ;; # Arch-specific
-                "video-trimmer") echo "" ;; # Not available
-                
-                # System utilities
-                "bluez-utils") echo "bluez-tools" ;;
-                "p7zip") echo "p7zip-full" ;;
-                "fuse") echo "fuse3" ;;
-                "libnotify") echo "libnotify-bin" ;;
-                "pacman-contrib") echo "" ;; # Arch-specific
-                "nwg-dock-hyprland") echo "nwg-dock" ;;
-                "octopi") echo "" ;; # Arch-specific GUI package manager
-                "uwsm") echo "" ;; # Not widely available
-                "swaync") echo "swaync" ;;
-                "mako") echo "mako-notifier" ;;
-                
-                # Qt theming
-                "qt5ct") echo "qt5-style-plugins" ;;
-                "qt6ct") echo "qt6-style-plugins" ;;
-                "adwaita-qt-git") echo "adwaita-qt" ;;
-                
-                # Default: return as-is
-                *) echo "$pkg" ;;
-            esac
-            ;;
-            
-        fedora)
-            case "$pkg" in
-                # Fonts
-                "ttf-dejavu-sans-code") echo "dejavu-sans-mono-fonts" ;;
-                "ttf-cascadia-code-nerd") echo "cascadia-code-fonts" ;;
-                "ttf-jetbrains-mono-nerd") echo "jetbrains-mono-fonts" ;;
-                "noto-fonts-emoji"|"noto-color-emoji-fontconfig") echo "google-noto-emoji-fonts" ;;
-                
-                # Browsers
-                "brave-bin") echo "brave-browser" ;;
-                "firefox") echo "firefox" ;;
-                "zen-browser-bin") echo "" ;; # Not available
-                
-                # System utilities
-                "bluez-utils") echo "bluez-tools" ;;
-                "p7zip") echo "p7zip-plugins" ;;
-                "libnotify") echo "libnotify" ;;
-                "swaync") echo "swaync" ;;
-                "mako") echo "mako" ;;
-                
-                # Not available
-                "sddm-sugar-candy-git") echo "" ;;
-                "ags-hyprpanel-git") echo "" ;;
-                "octopi") echo "" ;;
-                
-                *) echo "$pkg" ;;
-            esac
-            ;;
-            
-        suse)
-            case "$pkg" in
-                "firefox") echo "MozillaFirefox" ;;
-                "ttf-dejavu-sans-code") echo "dejavu-fonts" ;;
-                "brave-bin") echo "brave-browser" ;;
-                "bluez-utils") echo "bluez-tools" ;;
-                "swaync") echo "swaync" ;;
-                "mako") echo "mako" ;;
-                "sddm-sugar-candy-git") echo "" ;;
-                "ags-hyprpanel-git") echo "" ;;
-                "octopi") echo "" ;;
-                *) echo "$pkg" ;;
-            esac
-            ;;
-            
-        *)
-            echo "$pkg"
-            ;;
-    esac
-}
-
-# Function to check if a package is available
-is_package_available() {
-    local pkg="$1"
-    local translated_pkg=$(translate_package_name "$pkg")
-    
-    # Skip if translation returned empty (package not available)
-    [ -z "$translated_pkg" ] && return 1
-    
-    case "$DISTRO_FAMILY" in
-        arch)
-            if [ -n "$AUR_HELPER" ]; then
-                $AUR_HELPER -Ss "^${translated_pkg}$" >/dev/null 2>&1
-            else
-                pacman -Ss "^${translated_pkg}$" >/dev/null 2>&1
-            fi
-            ;;
-        debian)
-            apt-cache show "$translated_pkg" >/dev/null 2>&1
-            ;;
-        fedora)
-            dnf info "$translated_pkg" >/dev/null 2>&1
-            ;;
-        suse)
-            zypper info "$translated_pkg" >/dev/null 2>&1
-            ;;
-        *)
-            return 1
-            ;;
-    esac
 }
 
 # Function to build package list
 build_package_list() {
-    print_status "Building package list for $DISTRO_FAMILY..."
-    
-    # Core Hyprland ecosystem packages
-    hyprland_core=(
+    # Initialize the main package array
+    packages=(
+        # Hyprland ecosystem
         "hyprland"
         "hyprcursor"
         "hyprpaper"
@@ -625,12 +277,6 @@ build_package_list() {
         "xdg-desktop-portal-hyprland"
         "hypridle"
         "hyprlock"
-    )
-    
-    # Initialize the main package array
-    packages=(
-        # Hyprland ecosystem
-        "${hyprland_core[@]}"
         "hyprland-protocols"
         "hyprland-qt-support"
         "hyprland-qtutils"
@@ -641,6 +287,16 @@ build_package_list() {
         "hyprutils"
         "hyprwayland-scanner"
         "hyprgraphics"
+        "hyprviz-bin"
+        
+        # Packages
+        "pacman-contrib"
+        "octopi"
+        
+        # Dependacies
+        "meson" 
+        "cpio" 
+        "cmake"
         
         # GNOME components
         "mutter"
@@ -770,11 +426,6 @@ build_package_list() {
         "equibop-bin"
     )
     
-    # Add Arch-specific package management tools
-    if [ "$DISTRO_FAMILY" = "arch" ]; then
-        packages+=("pacman-contrib" "octopi")
-    fi
-    
     # Add display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         packages+=("sddm" "sddm-sugar-candy-git")
@@ -842,15 +493,11 @@ build_package_list() {
 
 # Function to install packages
 install_packages() {
-    print_status "Installing packages using $PACKAGE_MANAGER..."
+    print_status "Installing packages using $AUR_HELPER..."
     
     local installed=0
     local failed=()
     local skipped=()
-    
-    # For Arch-based systems
-    if [ "$DISTRO_FAMILY" = "arch" ]; then
-        print_status "Installing all packages with $AUR_HELPER..."
         
         # Try to install all packages at once
         if $AUR_HELPER -S --needed --noconfirm "${packages[@]}" 2>&1 | tee /tmp/install.log; then
@@ -885,68 +532,6 @@ install_packages() {
                 $AUR_HELPER -R --noconfirm swaync 2>/dev/null || true
             fi
         fi
-        
-    else
-        # For non-Arch distributions (Waybar only, no notification conflicts)
-        print_status "Translating and installing packages for $DISTRO_FAMILY..."
-        
-        for pkg in "${packages[@]}"; do
-            local translated_pkg=$(translate_package_name "$pkg")
-            
-            # Skip if no translation available
-            if [ -z "$translated_pkg" ]; then
-                skipped+=("$pkg (not available)")
-                print_warning "Skipping $pkg (not available on $DISTRO_FAMILY)"
-                continue
-            fi
-            
-            # Skip if package is the same (already processed)
-            if [ "$translated_pkg" = "$pkg" ] && [[ ! "$pkg" =~ ^(hypr|gnome|mutter|bluez|kitty|nautilus|rofi|firefox) ]]; then
-                # Check if it's a common package that should be available
-                if ! is_package_available "$translated_pkg"; then
-                    skipped+=("$pkg (not found)")
-                    print_warning "Skipping $pkg (not found in repositories)"
-                    continue
-                fi
-            fi
-            
-            print_status "Installing $translated_pkg (from $pkg)..."
-            
-            case "$DISTRO_FAMILY" in
-                debian)
-                    if [ "$DISTRO" = "pikaos" ]; then
-                        if pikman install -y "$translated_pkg" 2>/dev/null; then
-                            ((installed++))
-                        else
-                            failed+=("$pkg")
-                        fi
-                    else
-                        if sudo apt-get install -y "$translated_pkg" 2>/dev/null; then
-                            ((installed++))
-                        else
-                            failed+=("$pkg")
-                        fi
-                    fi
-                    ;;
-                    
-                fedora)
-                    if sudo dnf install -y "$translated_pkg" 2>/dev/null; then
-                        ((installed++))
-                    else
-                        failed+=("$pkg")
-                    fi
-                    ;;
-                    
-                suse)
-                    if sudo zypper install -y "$translated_pkg" 2>/dev/null; then
-                        ((installed++))
-                    else
-                        failed+=("$pkg")
-                    fi
-                    ;;
-            esac
-        done
-    fi
     
     # Summary
     echo
@@ -954,11 +539,7 @@ install_packages() {
     print_status "Successfully installed: $installed packages"
     
     if [ ${#skipped[@]} -gt 0 ]; then
-        print_warning "Skipped ${#skipped[@]} packages (not available on this distribution)"
-        if [ "$DISTRO_FAMILY" != "arch" ]; then
-            print_status "Some features may be limited on non-Arch distributions"
-            print_status "UltraCandy is optimized for Arch-based distributions"
-        fi
+        print_warning "Skipped ${#skipped[@]} packages"
     fi
     
     if [ ${#failed[@]} -gt 0 ]; then
@@ -1376,7 +957,6 @@ EOF
 setup_ultracandy() {
 
     print_status "Setting up UltraCandy configuration..."
-if [ "$DISTRO_FAMILY" != "arch" ]; then
     # Prevent notification daemon conflicts
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         $AUR_HELPER -R mako
@@ -1384,7 +964,7 @@ if [ "$DISTRO_FAMILY" != "arch" ]; then
         $AUR_HELPER -R swaync
     fi
     
-    #Add panel censtric apps
+     Add panel censtric apps
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
@@ -1394,7 +974,6 @@ if [ "$DISTRO_FAMILY" != "arch" ]; then
         echo
         $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako hyprviz-bin meson cpio cmake
     fi
-fi
 
     print_status "Setting up hyprexpo-plus for wrokspace overview..."
 
@@ -4106,7 +3685,7 @@ input {
 
 general {
     gaps_in = 6
-    gaps_out = 8	
+    gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
     col.active_border = $inverse_primary
@@ -4154,7 +3733,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 4
+    rounding = 10
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
@@ -4783,7 +4362,7 @@ input {
 
 general {
     gaps_in = 6
-    gaps_out = 8	
+    gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
     col.active_border = $inverse_primary
@@ -4831,7 +4410,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 4
+    rounding = 10
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
@@ -13068,8 +12647,8 @@ main() {
     #echo
 
     #detect distro
-    detect_distro
-    echo
+    #detect_distro
+    #echo
     
     # Choose shell
     choose_shell
