@@ -1384,7 +1384,7 @@ if [ "$DISTRO_FAMILY" != "arch" ]; then
         $AUR_HELPER -R swaync
     fi
     
-     Add panel censtric apps
+    #Add panel censtric apps
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
