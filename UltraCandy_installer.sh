@@ -4894,7 +4894,7 @@ auth {
 background {
     monitor =
     path = ~/.config/background.png
-    blur_passes = 3
+    blur_passes = 4
     blur_sizes = 0
     vibrancy = 0.1696
     noise = 0.01
@@ -4915,7 +4915,7 @@ input-field {
     font_family = C059 Bold Italic
     fade_on_empty = false
     fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
-    placeholder_text = <i><span>✝        $USER      ✝</span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
+    placeholder_text = <i><span>       $USER       </span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
     hide_input = false
     rounding = 40 # -1 means complete rounding (circle/oval)
     check_color = $rimary
@@ -4927,7 +4927,7 @@ input-field {
     #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
     invert_numlock = false # change color if numlock is off
     swap_font_color = false # see below
-    position = 0, 35
+    position = 0, 150
     halign = center
     valign = bottom
     shadow_passes = 10
@@ -4952,7 +4952,7 @@ label {
     monitor =
     #clock
     text = cmd[update:1000] echo "$TIME"
-    color = $primary_fixed_dim
+    color = $inverse_primary
     font_size = 55
     font_family = C059 Bold Italic
     position = 0, -150
