@@ -930,14 +930,6 @@ EOF
     
 # Function to automatically setup Hyprcandy configuration
 setup_ultracandy() {
-
-    print_status "Setting up hyprexpo-plus for workspace overview..."
-    
-    hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
-    hyprpm update
-    hyprpm enable hyprexpo-plus
-    hyprpm disable hyprexpo
-    hyprpm reload
     
     print_status "Setting up UltraCandy configuration..."
     
@@ -3498,7 +3490,7 @@ setup_custom_config() {
             echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
           if [ "$PANEL_CHOICE" = "waybar" ]; then
  # Add default content to the custom.conf file
-            cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
+            cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
 # ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 #██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
 #██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
@@ -4171,7 +4163,7 @@ EOF
 else  
 
             # Add default content to the custom.conf file
-            cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
+            cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
 # ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 #██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
 #██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
@@ -5427,6 +5419,14 @@ fi
         echo "⚠️  File not found: $HYPRLAND_CUSTOM"
     fi
         fi
+
+    print_status "Setting up hyprexpo-plus for workspace overview..."
+    
+    hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
+    hyprpm update
+    hyprpm enable hyprexpo-plus
+    hyprpm disable hyprexpo
+    hyprpm reload
 }
 
 update_keybinds() {
