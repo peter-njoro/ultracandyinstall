@@ -25,15 +25,7 @@ DISPLAY_MANAGER_SERVICE=""
 SHELL_CHOICE=""
 PANEL_CHOICE=""
 BROWSER_CHOICE=""
-DISTRO=""
-DISTRO_FAMILY=""
-PACKAGE_MANAGER=""
-HYPRLAND_AVAILABLE=false
 AUR_HELPER=""
-
-# Package arrays
-declare -a packages
-declare -a hyprland_core
 
 # Function to display multicolored ASCII art
 show_ascii_art() {
@@ -159,8 +151,6 @@ choose_panel() {
 
 choose_browser() {
     echo -e "${CYAN}Choose your browser:${NC}"
-    
-    if [ "$DISTRO_FAMILY" = "arch" ]; then
         echo "1) Brave (Seamless integration with UltraCandy GTK and Qt theme, fast, secure and privacy-focused)"
         echo "2) Firefox (Themed through python-pywalfox by running 'pywalfox update', open-source and privacy-focused)"
         echo "3) Zen Browser (Themed through zen mods and python-pywalfox, open-source and privacy-focused)"
@@ -178,22 +168,6 @@ choose_browser() {
                 *) print_error "Invalid choice. Please enter 1, 2, 3, 4 or 5." ;;
             esac
         done
-    else
-        echo "1) Brave (Seamless integration with UltraCandy GTK and Qt theme, fast, secure and privacy-focused)"
-        echo "2) Firefox (Themed through python-pywalfox by running 'pywalfox update', open-source and privacy-focused)"
-        echo "3) Other (Install your own browser post-installation)"
-        print_warning "Note: Zen Browser and Librewolf are only available on Arch-based distributions"
-        
-        while true; do
-            read -rp "Enter 1, 2, or 3: " browser_choice
-            case $browser_choice in
-                1) BROWSER_CHOICE="brave"; break ;;
-                2) BROWSER_CHOICE="firefox"; break ;;
-                3) BROWSER_CHOICE="other"; break ;;
-                *) print_error "Invalid choice. Please enter 1, 2, or 3." ;;
-            esac
-        done
-    fi
     
     echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
 }
@@ -226,133 +200,6 @@ choose_shell() {
     done
 }
 
-# Function to detect distribution and set package manager
-detect_distro() {
-    if [ ! -f /etc/os-release ]; then
-        print_error "Cannot detect distribution - /etc/os-release not found"
-        exit 1
-    fi
-    
-    . /etc/os-release
-    DISTRO="$ID"
-    
-    case "$ID" in
-        arch|manjaro|cachyos|endeavouros|artix|garuda)
-            DISTRO_FAMILY="arch"
-            PACKAGE_MANAGER="pacman"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        ubuntu|debian)
-            DISTRO_FAMILY="debian"
-            PACKAGE_MANAGER="apt"
-            if [ "$ID" = "ubuntu" ] && [ "${VERSION_ID%%.*}" -ge 23 ]; then
-                HYPRLAND_AVAILABLE=true
-            elif [ "$ID" = "debian" ]; then
-                # Check for backports
-                if grep -q "^deb.*backports" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
-                    HYPRLAND_AVAILABLE=true
-                else
-                    HYPRLAND_AVAILABLE=false
-                fi
-            fi
-            ;;
-        pop)
-            DISTRO_FAMILY="debian"
-            PACKAGE_MANAGER="apt"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        pikaos)
-            DISTRO_FAMILY="debian"
-            PACKAGE_MANAGER="pikman"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        fedora|nobara)
-            DISTRO_FAMILY="fedora"
-            PACKAGE_MANAGER="dnf"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        opensuse-tumbleweed)
-            DISTRO_FAMILY="suse"
-            PACKAGE_MANAGER="zypper"
-            HYPRLAND_AVAILABLE=true
-            ;;
-        *)
-            DISTRO_FAMILY="unknown"
-            PACKAGE_MANAGER="unknown"
-            HYPRLAND_AVAILABLE=false
-            ;;
-    esac
-    
-    print_status "Detected distribution: $DISTRO ($DISTRO_FAMILY)"
-    print_status "Package manager: $PACKAGE_MANAGER"
-    
-    if [ "$HYPRLAND_AVAILABLE" = true ]; then
-        print_success "Hyprland is available for your distribution"
-    else
-        print_error "Hyprland is not officially supported on your distribution"
-        print_warning "You may need to build from source or use an unofficial repository"
-        read -p "Do you want to continue anyway? (y/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
-        fi
-    fi
-}
-
-# Function to setup distribution-specific repositories
-setup_repos() {
-    print_status "Setting up repositories for $DISTRO_FAMILY..."
-    
-    case "$DISTRO_FAMILY" in
-        debian)
-            # Add Hyprland repository for Ubuntu 23+
-            if [ "$DISTRO" = "ubuntu" ] && [ "${VERSION_ID%%.*}" -ge 23 ]; then
-                if ! grep -q "hyprland" /etc/apt/sources.list.d/* 2>/dev/null; then
-                    print_status "Adding Hyprland PPA..."
-                    sudo add-apt-repository -y ppa:hyprland/hyprland
-                fi
-            fi
-            
-            # Setup Flatpak
-            if ! command -v flatpak >/dev/null 2>&1; then
-                print_status "Installing Flatpak..."
-                sudo apt install -y flatpak
-                sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-            fi
-            
-            sudo apt update
-            ;;
-            
-        fedora)
-            # Add COPR for Hyprland
-            if ! dnf copr list 2>/dev/null | grep -q "solopasha/hyprland"; then
-                print_status "Adding Hyprland COPR..."
-                sudo dnf copr enable -y solopasha/hyprland
-            fi
-            
-            # Enable RPM Fusion
-            if ! dnf repolist 2>/dev/null | grep -q "rpmfusion"; then
-                print_status "Enabling RPM Fusion repositories..."
-                sudo dnf install -y \
-                    https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-                    https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-            fi
-            
-            sudo dnf update -y
-            ;;
-            
-        suse)
-            if ! zypper lr 2>/dev/null | grep -q "hyprland"; then
-                print_status "Adding Hyprland repository..."
-                sudo zypper ar -f https://download.opensuse.org/repositories/home:/jmattheis:/hyprland/openSUSE_Tumbleweed/home:jmattheis:hyprland.repo
-            fi
-            sudo zypper refresh
-            ;;
-    esac
-    
-    print_success "Repositories configured"
-}
-
 # Function to install yay
 install_yay() {
     print_status "Installing yay..."
@@ -381,10 +228,7 @@ install_paru() {
 
 # Function to check or install appropriate package manager
 check_or_install_package_manager() {
-    print_status "Setting up package manager for $DISTRO..."
-    
-    case "$DISTRO_FAMILY" in
-        arch)
+    print_status "Setting up package manager"
             if command -v yay >/dev/null 2>&1; then
                 AUR_HELPER="yay"
                 print_success "yay is already installed"
@@ -419,206 +263,13 @@ check_or_install_package_manager() {
                     esac
                 done
             fi
-            ;;
-            
-        debian)
-            if [ "$DISTRO" = "pikaos" ]; then
-                if ! command -v pikman >/dev/null 2>&1; then
-                    print_status "Installing pikman..."
-                    curl -s https://raw.githubusercontent.com/PikaOS-Linux/pikman/main/install.sh | sudo bash
-                fi
-            else
-                print_status "Updating package lists..."
-                sudo apt-get update
-                print_status "Installing essential build tools..."
-                sudo apt-get install -y build-essential git
-            fi
-            ;;
-            
-        fedora)
-            print_status "Updating DNF and installing development tools..."
-            sudo dnf upgrade -y
-            sudo dnf groupinstall -y "Development Tools"
-            sudo dnf install -y git
-            ;;
-            
-        suse)
-            print_status "Updating zypper and installing development tools..."
-            sudo zypper refresh
-            sudo zypper install -y -t pattern devel_basis
-            sudo zypper install -y git
-            ;;
-            
-        *)
-            print_error "Unsupported distribution family: $DISTRO_FAMILY"
-            exit 1
-            ;;
-    esac
-}
-
-# Function to translate package names based on distribution
-translate_package_name() {
-    local pkg="$1"
-    
-    case "$DISTRO_FAMILY" in
-        arch)
-            # Arch uses original names
-            echo "$pkg"
-            ;;
-            
-        debian)
-            case "$pkg" in
-                # Hyprland ecosystem
-                "hyprland") echo "hyprland" ;;
-                "hyprcursor") echo "hyprcursor" ;;
-                "hypridle") echo "hypridle" ;;
-                "hyprland-protocols") echo "hyprland-protocols" ;;
-                "hyprlock") echo "hyprlock" ;;
-                "hyprpaper") echo "hyprpaper" ;;
-                "hyprpicker") echo "hyprpicker" ;;
-                "hyprpolkitagent") echo "hyprland-polkit-agent" ;;
-                "xdg-desktop-portal-hyprland") echo "xdg-desktop-portal-hyprland" ;;
-                
-                # GNOME components
-                "extension-manager") echo "gnome-shell-extension-manager" ;;
-                
-                # Fonts
-                "ttf-dejavu-sans-code") echo "fonts-dejavu" ;;
-                "ttf-cascadia-code-nerd") echo "fonts-cascadia-code" ;;
-                "ttf-fantasque-nerd") echo "fonts-fantasque-sans" ;;
-                "ttf-firacode-nerd") echo "fonts-firacode" ;;
-                "ttf-jetbrains-mono-nerd") echo "fonts-jetbrains-mono" ;;
-                "ttf-nerd-fonts-symbols"|"ttf-nerd-fonts-symbols-common"|"ttf-nerd-fonts-symbols-mono") echo "fonts-nerd-font-hack" ;;
-                "ttf-meslo-nerd") echo "fonts-meslo-nerd" ;;
-                "powerline-fonts") echo "fonts-powerline" ;;
-                "noto-fonts-emoji"|"noto-color-emoji-fontconfig") echo "fonts-noto-color-emoji" ;;
-                "awesome-terminal-fonts") echo "fonts-font-awesome" ;;
-                
-                # AUR packages that need alternatives or are unavailable
-                "grimblast-git") echo "grim" ;;
-                "waypaper-git") echo "swaybg" ;;
-                "ags-hyprpanel-git") echo "" ;; # Not available
-                "brave-bin") echo "brave-browser" ;;
-                "matugen-bin") echo "matugen" ;;
-                "matugen-bin") echo "python3-material-color-utilities" ;;
-                "bibata-cursor-theme-bin") echo "bibata-cursor-theme" ;;
-                "sddm-sugar-candy-git") echo "" ;; # Not available (non-Arch uses GDM)
-                "oh-my-zsh-git") echo "zsh-oh-my-zsh" ;;
-                "zen-browser-bin") echo "" ;; # Not available
-                "fisher") echo "" ;; # Install via Fish
-                "equibop-bin") echo "" ;; # Not available
-                "downgrade") echo "" ;; # Arch-specific
-                "video-trimmer") echo "" ;; # Not available
-                
-                # System utilities
-                "bluez-utils") echo "bluez-tools" ;;
-                "p7zip") echo "p7zip-full" ;;
-                "fuse") echo "fuse3" ;;
-                "libnotify") echo "libnotify-bin" ;;
-                "pacman-contrib") echo "" ;; # Arch-specific
-                "nwg-dock-hyprland") echo "nwg-dock" ;;
-                "octopi") echo "" ;; # Arch-specific GUI package manager
-                "uwsm") echo "" ;; # Not widely available
-                "swaync") echo "swaync" ;;
-                "mako") echo "mako-notifier" ;;
-                
-                # Qt theming
-                "qt5ct") echo "qt5-style-plugins" ;;
-                "qt6ct") echo "qt6-style-plugins" ;;
-                "adwaita-qt-git") echo "adwaita-qt" ;;
-                
-                # Default: return as-is
-                *) echo "$pkg" ;;
-            esac
-            ;;
-            
-        fedora)
-            case "$pkg" in
-                # Fonts
-                "ttf-dejavu-sans-code") echo "dejavu-sans-mono-fonts" ;;
-                "ttf-cascadia-code-nerd") echo "cascadia-code-fonts" ;;
-                "ttf-jetbrains-mono-nerd") echo "jetbrains-mono-fonts" ;;
-                "noto-fonts-emoji"|"noto-color-emoji-fontconfig") echo "google-noto-emoji-fonts" ;;
-                
-                # Browsers
-                "brave-bin") echo "brave-browser" ;;
-                "firefox") echo "firefox" ;;
-                "zen-browser-bin") echo "" ;; # Not available
-                
-                # System utilities
-                "bluez-utils") echo "bluez-tools" ;;
-                "p7zip") echo "p7zip-plugins" ;;
-                "libnotify") echo "libnotify" ;;
-                "swaync") echo "swaync" ;;
-                "mako") echo "mako" ;;
-                
-                # Not available
-                "sddm-sugar-candy-git") echo "" ;;
-                "ags-hyprpanel-git") echo "" ;;
-                "octopi") echo "" ;;
-                
-                *) echo "$pkg" ;;
-            esac
-            ;;
-            
-        suse)
-            case "$pkg" in
-                "firefox") echo "MozillaFirefox" ;;
-                "ttf-dejavu-sans-code") echo "dejavu-fonts" ;;
-                "brave-bin") echo "brave-browser" ;;
-                "bluez-utils") echo "bluez-tools" ;;
-                "swaync") echo "swaync" ;;
-                "mako") echo "mako" ;;
-                "sddm-sugar-candy-git") echo "" ;;
-                "ags-hyprpanel-git") echo "" ;;
-                "octopi") echo "" ;;
-                *) echo "$pkg" ;;
-            esac
-            ;;
-            
-        *)
-            echo "$pkg"
-            ;;
-    esac
-}
-
-# Function to check if a package is available
-is_package_available() {
-    local pkg="$1"
-    local translated_pkg=$(translate_package_name "$pkg")
-    
-    # Skip if translation returned empty (package not available)
-    [ -z "$translated_pkg" ] && return 1
-    
-    case "$DISTRO_FAMILY" in
-        arch)
-            if [ -n "$AUR_HELPER" ]; then
-                $AUR_HELPER -Ss "^${translated_pkg}$" >/dev/null 2>&1
-            else
-                pacman -Ss "^${translated_pkg}$" >/dev/null 2>&1
-            fi
-            ;;
-        debian)
-            apt-cache show "$translated_pkg" >/dev/null 2>&1
-            ;;
-        fedora)
-            dnf info "$translated_pkg" >/dev/null 2>&1
-            ;;
-        suse)
-            zypper info "$translated_pkg" >/dev/null 2>&1
-            ;;
-        *)
-            return 1
-            ;;
-    esac
 }
 
 # Function to build package list
 build_package_list() {
-    print_status "Building package list for $DISTRO_FAMILY..."
-    
-    # Core Hyprland ecosystem packages
-    hyprland_core=(
+    # Initialize the main package array
+    packages=(
+        # Hyprland ecosystem
         "hyprland"
         "hyprcursor"
         "hyprpaper"
@@ -626,12 +277,6 @@ build_package_list() {
         "xdg-desktop-portal-hyprland"
         "hypridle"
         "hyprlock"
-    )
-    
-    # Initialize the main package array
-    packages=(
-        # Hyprland ecosystem
-        "${hyprland_core[@]}"
         "hyprland-protocols"
         "hyprland-qt-support"
         "hyprland-qtutils"
@@ -642,6 +287,16 @@ build_package_list() {
         "hyprutils"
         "hyprwayland-scanner"
         "hyprgraphics"
+        "hyprviz-bin"
+        
+        # Packages
+        "pacman-contrib"
+        "octopi"
+        
+        # Dependacies
+        "meson" 
+        "cpio" 
+        "cmake"
         
         # GNOME components
         "mutter"
@@ -668,7 +323,6 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
-        "sddm-sugar-candy-git"
         "power-profiles-daemon"
         "bluez"
         "bluez-utils"
@@ -722,11 +376,7 @@ build_package_list() {
         "inotify-tools"
         "bc"
         "libnotify"
-        "jq" 
-        "meson" 
-        "cpio"
-        "cmake"
-        "g++"
+        "jq"
         
         # Fonts
         "ttf-dejavu-sans-code"
@@ -776,11 +426,6 @@ build_package_list() {
         "equibop-bin"
     )
     
-    # Add Arch-specific package management tools
-    if [ "$DISTRO_FAMILY" = "arch" ]; then
-        packages+=("pacman-contrib" "octopi")
-    fi
-    
     # Add display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         packages+=("sddm" "sddm-sugar-candy-git")
@@ -816,7 +461,6 @@ build_package_list() {
         packages+=(
             "waybar"
             "waypaper-git"
-            "hyprviz-bin"
             "swaync"
         )
         print_status "Added Waybar to package list"
@@ -824,7 +468,6 @@ build_package_list() {
         # Hyprpanel (Arch only)
         packages+=(
             "ags-hyprpanel-git"
-            "hyprviz-bin"
             "mako"
         )
         print_status "Added Hyprpanel to package list"
@@ -850,15 +493,11 @@ build_package_list() {
 
 # Function to install packages
 install_packages() {
-    print_status "Installing packages using $PACKAGE_MANAGER..."
+    print_status "Installing packages using $AUR_HELPER..."
     
     local installed=0
     local failed=()
     local skipped=()
-    
-    # For Arch-based systems
-    if [ "$DISTRO_FAMILY" = "arch" ]; then
-        print_status "Installing all packages with $AUR_HELPER..."
         
         # Try to install all packages at once
         if $AUR_HELPER -S --needed --noconfirm "${packages[@]}" 2>&1 | tee /tmp/install.log; then
@@ -893,68 +532,6 @@ install_packages() {
                 $AUR_HELPER -R --noconfirm swaync 2>/dev/null || true
             fi
         fi
-        
-    else
-        # For non-Arch distributions (Waybar only, no notification conflicts)
-        print_status "Translating and installing packages for $DISTRO_FAMILY..."
-        
-        for pkg in "${packages[@]}"; do
-            local translated_pkg=$(translate_package_name "$pkg")
-            
-            # Skip if no translation available
-            if [ -z "$translated_pkg" ]; then
-                skipped+=("$pkg (not available)")
-                print_warning "Skipping $pkg (not available on $DISTRO_FAMILY)"
-                continue
-            fi
-            
-            # Skip if package is the same (already processed)
-            if [ "$translated_pkg" = "$pkg" ] && [[ ! "$pkg" =~ ^(hypr|gnome|mutter|bluez|kitty|nautilus|rofi|firefox) ]]; then
-                # Check if it's a common package that should be available
-                if ! is_package_available "$translated_pkg"; then
-                    skipped+=("$pkg (not found)")
-                    print_warning "Skipping $pkg (not found in repositories)"
-                    continue
-                fi
-            fi
-            
-            print_status "Installing $translated_pkg (from $pkg)..."
-            
-            case "$DISTRO_FAMILY" in
-                debian)
-                    if [ "$DISTRO" = "pikaos" ]; then
-                        if pikman install -y "$translated_pkg" 2>/dev/null; then
-                            ((installed++))
-                        else
-                            failed+=("$pkg")
-                        fi
-                    else
-                        if sudo apt-get install -y "$translated_pkg" 2>/dev/null; then
-                            ((installed++))
-                        else
-                            failed+=("$pkg")
-                        fi
-                    fi
-                    ;;
-                    
-                fedora)
-                    if sudo dnf install -y "$translated_pkg" 2>/dev/null; then
-                        ((installed++))
-                    else
-                        failed+=("$pkg")
-                    fi
-                    ;;
-                    
-                suse)
-                    if sudo zypper install -y "$translated_pkg" 2>/dev/null; then
-                        ((installed++))
-                    else
-                        failed+=("$pkg")
-                    fi
-                    ;;
-            esac
-        done
-    fi
     
     # Summary
     echo
@@ -962,11 +539,7 @@ install_packages() {
     print_status "Successfully installed: $installed packages"
     
     if [ ${#skipped[@]} -gt 0 ]; then
-        print_warning "Skipped ${#skipped[@]} packages (not available on this distribution)"
-        if [ "$DISTRO_FAMILY" != "arch" ]; then
-            print_status "Some features may be limited on non-Arch distributions"
-            print_status "UltraCandy is optimized for Arch-based distributions"
-        fi
+        print_warning "Skipped ${#skipped[@]} packages"
     fi
     
     if [ ${#failed[@]} -gt 0 ]; then
@@ -1383,9 +956,8 @@ EOF
 # Function to automatically setup Hyprcandy configuration
 setup_ultracandy() {
 
-    print_status "Setting up hyprexpo-plus for wrokspace overview..."
-
-    hyprpm update
+    print_status "Setting up hyprexpo-plus for workspace overview..."
+    
     hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
     hyprpm update
     hyprpm enable hyprexpo-plus
@@ -2123,7 +1695,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_status_display.sh"
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 
 CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_OUT=$((CURRENT_GAPS_OUT + 1))
@@ -2145,7 +1717,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 
 CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_OUT=$((CURRENT_GAPS_OUT > 0 ? CURRENT_GAPS_OUT - 1 : 0))
@@ -2164,7 +1736,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_IN=$((CURRENT_GAPS_IN + 1))
 sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
@@ -2182,7 +1754,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_IN=$((CURRENT_GAPS_IN > 0 ? CURRENT_GAPS_IN - 1 : 0))
 sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
@@ -2200,7 +1772,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
 NEW_BORDER=$((CURRENT_BORDER + 1))
 sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$NEW_BORDER/" "$CONFIG_FILE"
@@ -2218,7 +1790,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 
 CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
 NEW_BORDER=$((CURRENT_BORDER > 0 ? CURRENT_BORDER - 1 : 0))
@@ -2238,7 +1810,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
 NEW_ROUNDING=$((CURRENT_ROUNDING + 1))
 sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
@@ -2257,7 +1829,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
 NEW_ROUNDING=$((CURRENT_ROUNDING > 0 ? CURRENT_ROUNDING - 1 : 0))
 sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
@@ -2276,7 +1848,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 
 case "$1" in
     "minimal")
@@ -2332,7 +1904,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
 
 GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
@@ -2567,7 +2139,7 @@ cat > "$HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh" << 'EOF'
 
 GTK3_FILE="$HOME/.config/gtk-3.0/settings.ini"
 GTK4_FILE="$HOME/.config/gtk-4.0/settings.ini"
-HYPRCONF="$HOME/.config/hypr/hyprviz.conf"
+HYPRCONF="$HOME/.config/hyprcustom/custom.conf"
 
 get_value() {
     grep -E "^$1=" "$1" 2>/dev/null | cut -d'=' -f2 | tr -d ' '
@@ -3947,11 +3519,11 @@ EOF
 setup_custom_config() {
 # Create the custom settings directory and files if it doesn't already exist
         if [ ! -d "$HOME/.config/hyprcustom" ]; then
-            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hypr/hyprviz.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
+            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
             echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
           if [ "$PANEL_CHOICE" = "waybar" ]; then
  # Add default content to the custom.conf file
-            cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
+            cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
 # ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 #██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
 #██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
@@ -4246,7 +3818,7 @@ windowrule = move 25% 10%-,class:(nwg-look)
 windowrule = pin,class:(nwg-look)
 # nwg-displays
 windowrule = float,class:(nwg-displays)
-windowrule = size 990 600,class:(nwg-displays)
+windowrule = size 900 600,class:(nwg-displays)
 windowrule = move 15% 10%-,class:(nwg-displays)
 windowrule = pin,class:(nwg-displays)
 # System Mission Center
@@ -4271,10 +3843,6 @@ windowrule = float, class:(hyprland-share-picker)
 windowrule = pin, class:(hyprland-share-picker)
 windowrule = center, title:class:(hyprland-share-picker)
 windowrule = size 600 400,class:(hyprland-share-picker)
-# Hyprland Settings App
-windowrule = float,title:(hyprviz)
-windowrule = size 1000 660,title:(hyprviz)
-windowrule = center,title:(hyprviz)
 # General floating
 windowrule = float,class:(dotfiles-floating)
 windowrule = size 1000 700,class:(dotfiles-floating)
@@ -4520,10 +4088,10 @@ plugin {
     hyprexpo {
         #general 
         columns = 3
-        gaps_in = 8
-        gaps_out = 10
+        gaps_in = 10
+        gaps_out = 12
         bg_col = $inverse_primary
-        workspace = first 1
+        workspace_method = first 1
         
         #borders
         border_style = hyprland
@@ -4628,7 +4196,7 @@ EOF
 else  
 
             # Add default content to the custom.conf file
-            cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
+            cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
 # ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 #██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
 #██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
@@ -4923,7 +4491,7 @@ windowrule = move 25% 10%-,class:(nwg-look)
 windowrule = pin,class:(nwg-look)
 # nwg-displays
 windowrule = float,class:(nwg-displays)
-windowrule = size 990 600,class:(nwg-displays)
+windowrule = size 900 600,class:(nwg-displays)
 windowrule = move 15% 10%-,class:(nwg-displays)
 windowrule = pin,class:(nwg-displays)
 # System Mission Center
@@ -4948,10 +4516,6 @@ windowrule = float, class:(hyprland-share-picker)
 windowrule = pin, class:(hyprland-share-picker)
 windowrule = center, title:class:(hyprland-share-picker)
 windowrule = size 600 400,class:(hyprland-share-picker)
-# Hyprland Settings App
-windowrule = float,title:(hyprviz)
-windowrule = size 1000 660,title:(hyprviz)
-windowrule = center,title:(hyprviz)
 # General floating
 windowrule = float,class:(dotfiles-floating)
 windowrule = size 1000 700,class:(dotfiles-floating)
@@ -5156,8 +4720,8 @@ layerrule = blur,logout_dialog
 layerrule = ignorezero,logout_dialog
 layerrule = blur,gtk-layer-shell
 layerrule = ignorezero,gtk-layer-shell
-layerrule = blur,waybar
-layerrule = ignorezero,waybar
+layerrule = blur,bar-0
+layerrule = ignorezero,bar-0
 layerrule = blur,dashboardmenu
 layerrule = ignorezero,dashboardmenu
 layerrule = blur,calendarmenu
@@ -5188,7 +4752,6 @@ misc {
     disable_splash_rendering = false
     initial_workspace_tracking = 1
 }
-
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                            Plugins                          ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -5197,10 +4760,10 @@ plugin {
     hyprexpo {
         #general 
         columns = 3
-        gaps_in = 8
-        gaps_out = 10
+        gaps_in = 10
+        gaps_out = 12
         bg_col = $inverse_primary
-        workspace = first 1
+        workspace_method = first 1
         
         #borders
         border_style = hyprland
@@ -5331,7 +4894,7 @@ auth {
 background {
     monitor =
     path = ~/.config/background.png
-    blur_passes = 4
+    blur_passes = 3
     blur_sizes = 0
     vibrancy = 0.1696
     noise = 0.01
@@ -5352,7 +4915,7 @@ input-field {
     font_family = C059 Bold Italic
     fade_on_empty = false
     fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
-    placeholder_text = <i><span>       $USER       </span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
+    placeholder_text = <i><span>✝        $USER      ✝</span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
     hide_input = false
     rounding = 40 # -1 means complete rounding (circle/oval)
     check_color = $rimary
@@ -5364,7 +4927,7 @@ input-field {
     #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
     invert_numlock = false # change color if numlock is off
     swap_font_color = false # see below
-    position = 0, 150
+    position = 0, 35
     halign = center
     valign = bottom
     shadow_passes = 10
@@ -5389,7 +4952,7 @@ label {
     monitor =
     #clock
     text = cmd[update:1000] echo "$TIME"
-    color = $source_color
+    color = $primary_fixed_dim
     font_size = 55
     font_family = C059 Bold Italic
     position = 0, -150
@@ -5508,7 +5071,6 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 
 #### Actions ####
 
-bind = $mainMod, M, exec, ~/.config/hypr/scripts/power.sh exit 				  #Logout
 bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo-plus workspaces overview
 bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
@@ -5733,7 +5295,6 @@ bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
 
 #### Actions ####
 
-bind = $mainMod, M, exec, ~/.config/hypr/scripts/power.sh exit 				  #Logout
 bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo-plus workspaces overview
 bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
@@ -5881,7 +5442,7 @@ fi
 
     # 🎨 Update Hyprland custom.conf with current username  
     USERNAME=$(whoami)      
-    HYPRLAND_CUSTOM="$HOME/.config/hypr/hyprviz.conf"
+    HYPRLAND_CUSTOM="$HOME/.config/hyprcustom/custom.conf"
     echo "🎨 Updating Hyprland custom.conf with current username..."		
     
     if [ -f "$HYPRLAND_CUSTOM" ]; then
@@ -5933,7 +5494,7 @@ update_keybinds() {
 }
 
 update_custom() {
-    local CUSTOM_CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+    local CUSTOM_CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
     
     # Check if custom config file exists
     if [ ! -f "$CUSTOM_CONFIG_FILE" ]; then
@@ -6375,7 +5936,7 @@ function createCandyUtilsBox() {
     // Hyprsunset controls
     const hyprsunsetBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER });
     let hyprsunsetEnabled = loadHyprsunsetState();
-    const hyprsunsetBtn = new Gtk.Button({ label: hyprsunsetEnabled ? 'Hyprsunset 󰌵' : 'Hyprsunset 󰌶' });
+    const hyprsunsetBtn = new Gtk.Button({ label: hyprsunsetEnabled ? 'Hyprsunset 󰌵' : 'Hyprsunset 󰹏' });
     if (hyprsunsetEnabled) hyprsunsetBtn.add_css_class('neon-highlight');
     hyprsunsetBtn.connect('clicked', () => {
         if (!hyprsunsetEnabled) {
@@ -6385,7 +5946,7 @@ function createCandyUtilsBox() {
             hyprsunsetEnabled = true;
         } else {
             GLib.spawn_command_line_async('pkill hyprsunset');
-            hyprsunsetBtn.set_label('Hyprsunset 󰌶');
+            hyprsunsetBtn.set_label('Hyprsunset 󰹏');
             hyprsunsetBtn.remove_css_class('neon-highlight');
             hyprsunsetEnabled = false;
         }
@@ -6429,7 +5990,7 @@ function createCandyUtilsBox() {
         } catch (e) {}
     }
     function toggleXray(enabled) {
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         const newValue = enabled ? 'true' : 'false';
         GLib.spawn_command_line_async(`sed -i 's/xray = .*/xray = ${newValue}/' "${configFile}"`);
         GLib.spawn_command_line_async('hyprctl reload');
@@ -6450,7 +6011,7 @@ function createCandyUtilsBox() {
         }
         saveXrayState(xrayEnabled);
     });
-    //leftBox.append(xrayBtn);
+    leftBox.append(xrayBtn);
 
     // --- Opacity Toggle Button ---
     const opacityStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'opacity.state']);
@@ -6498,7 +6059,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateActiveOpacity(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -6542,7 +6103,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateBlurSize(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -6590,7 +6151,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateBlurPass(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -6769,81 +6330,21 @@ function createCandyUtilsBox() {
     }
     
     let waybarIslandsEnabled = loadWaybarState();
-    const waybarToggleBtn = new Gtk.Button({ label: waybarIslandsEnabled ? 'Waybar ' : 'Waybar ' });
+    const waybarToggleBtn = new Gtk.Button({ label: waybarIslandsEnabled ? 'Waybar Islands' : 'Waybar Bar' });
     if (waybarIslandsEnabled) waybarToggleBtn.add_css_class('neon-highlight');
     waybarToggleBtn.connect('clicked', () => {
         waybarIslandsEnabled = !waybarIslandsEnabled;
         toggleWaybarMode(waybarIslandsEnabled);
         if (waybarIslandsEnabled) {
-            waybarToggleBtn.set_label('Waybar ');
+            waybarToggleBtn.set_label('Waybar Islands');
             waybarToggleBtn.add_css_class('neon-highlight');
         } else {
-            waybarToggleBtn.set_label('Waybar ');
+            waybarToggleBtn.set_label('Waybar Bar');
             waybarToggleBtn.remove_css_class('neon-highlight');
         }
         saveWaybarState(waybarIslandsEnabled);
     });
     presetBox.append(waybarToggleBtn);
-    
-    // --- Waybar Bottom|Top Toggle Button ---
-    const waybarConfigFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar-position.txt']);
-    function loadWaybarConfig() {
-        try {
-            let [ok, contents] = GLib.file_get_contents(waybarConfigFile);
-            if (ok && contents) {
-                let config = imports.byteArray.toString(contents).trim();
-                return config === 'bottom';
-            }
-        } catch (e) {}
-        return false; // Default to top position
-    }
-    function saveWaybarConfig(isBottom) {
-        try {
-            GLib.file_set_contents(waybarConfigFile, isBottom ? 'bottom' : 'top');
-        } catch (e) {}
-    }
-    function toggleWaybarSetting(isBottom) {
-        const waybarConfigFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'config.jsonc']);
-        const RofiFile1 = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'rofi', 'bluetooth-menu.rasi']);
-        const RofiFile2 = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'rofi', 'power-menu.rasi']);
-        const RofiFile3 = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'rofi', 'wifi-menu.rasi']);
-        
-        if (isBottom) {
-            // Change to bottom position:
-            GLib.spawn_command_line_async(`sed -i '5s/"position": "top",/"position": "bottom",/' '${waybarConfigFile}'`);
-            // Update rofi menu positions
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 northeast;/location:                 southeast;/' '${RofiFile1}'`);
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 northeast;/location:                 southeast;/' '${RofiFile2}'`);
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 northeast;/location:                 southeast;/' '${RofiFile3}'`);
-        } else {
-            // Change to top position:
-            GLib.spawn_command_line_async(`sed -i '5s/"position": "bottom",/"position": "top",/' '${waybarConfigFile}'`);
-            // Update rofi menu positions
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 southeast;/location:                 northeast;/' '${RofiFile1}'`);
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 southeast;/location:                 northeast;/' '${RofiFile2}'`);
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 southeast;/location:                 northeast;/' '${RofiFile3}'`);
-        }
-        // Reload waybar
-        GLib.spawn_command_line_async('systemctl --user stop waybar.service && sleep 0.3 && pkill -x waybar ');
-        GLib.spawn_command_line_async('systemctl --user restart waybar.service');
-    }
-    
-    let waybarBottomEnabled = loadWaybarConfig();
-    const waybarPositionBtn = new Gtk.Button({ label: waybarBottomEnabled ? 'Waybar ' : 'Waybar ' });
-    if (waybarBottomEnabled) waybarPositionBtn.add_css_class('neon-highlight');
-    waybarPositionBtn.connect('clicked', () => {
-        waybarBottomEnabled = !waybarBottomEnabled;
-        toggleWaybarSetting(waybarBottomEnabled);
-        if (waybarBottomEnabled) {
-            waybarPositionBtn.set_label('Waybar ');
-            waybarPositionBtn.add_css_class('neon-highlight');
-        } else {
-            waybarPositionBtn.set_label('Waybar ');
-            waybarPositionBtn.remove_css_class('neon-highlight');
-        }
-        saveWaybarConfig(waybarBottomEnabled);
-    });
-    presetBox.append(waybarPositionBtn);
     
     // Add 'New Start Icon' button before Dock presets
     const newStartIconBtn = new Gtk.Button({ label: 'New Start Icon' });
@@ -6917,21 +6418,21 @@ function createCandyUtilsBox() {
     
         // Matugen scheme buttons
     const matugenSchemes = [
+        'Dark',
         'Light',
-        'Graphite',
         'Content',
-        'Expressive',
+        'Expressive', 
+        'Fruit-salad',
         'Neutral',
         'Rainbow',
-        'Tonal-spot',
-        'Fruit-salad',
+        'Tonal-spot'
     ];
     
     function updateMatugenScheme(schemeName) {
         const waypaperIntegrationFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'hooks', 'waypaper_integration.sh']);
         const gtk3File = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-3.0', 'gtk.css']);
         const gtk4File = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-4.0', 'gtk.css']);
-        const hyprFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const hyprFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         const utilsFile = GLib.build_filenamev([GLib.get_home_dir(), '.ultracandy', 'GJS', 'src', 'candy-utils.js']);
         const waybarFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
         const dockFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'nwg-dock-hyprland', 'style.css']);
@@ -6939,7 +6440,7 @@ function createCandyUtilsBox() {
         
         // Convert scheme name to matugen format
         const schemeMap = {
-            'Graphite': 'scheme-monochrome',
+            'Dark': 'scheme-monochrome',
             'Light': 'scheme-fidelity',
             'Content': 'scheme-content',
             'Expressive': 'scheme-expressive',
@@ -6956,8 +6457,8 @@ function createCandyUtilsBox() {
         GLib.spawn_command_line_async(`sed -i 's/--type scheme-[^ ]*/--type ${matugenScheme}/' '${waypaperIntegrationFile}'`);
         
         // Handle monochrome vs other schemes for GTK CSS
-        if (schemeName === 'Graphite') {
-            // Replace @on_secondary with @on_primary_fixed_variant for graphite/monochrome
+        if (schemeName === 'Dark') {
+            // Replace @on_secondary with @on_primary_fixed_variant for dark/monochrome
             GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk4File}'`);
             GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_primary_fixed_variant/g' '${gtk3File}'`);
@@ -6984,7 +6485,7 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2295s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
@@ -7018,7 +6519,7 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @on_primary/accent_fg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $inverse_primary/col.active_border = $primary_fixed_dim/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $inverse_primary,class:/bordercolor $primary_fixed_dim,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 487s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 2355s/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 487s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 2295s/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@inverse_primary;/@primary_fixed_dim;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@inverse_primary;/@primary_fixed_dim;/g' '${swayncFile}'`);
@@ -7052,7 +6553,7 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2295s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
@@ -7086,7 +6587,7 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2295s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
@@ -7120,7 +6621,7 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GGLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2295s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
@@ -7154,7 +6655,7 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2295s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`); 
@@ -7188,7 +6689,7 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2295s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
@@ -7222,7 +6723,7 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2295s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`); 
@@ -7242,7 +6743,7 @@ function createCandyUtilsBox() {
             const btn = matugenButtons[i];
             const schemeName = matugenSchemes[i];
             const schemeMap = {
-                'Graphite': 'scheme-monochrome',
+                'Dark': 'scheme-monochrome',
                 'Light': 'scheme-fidelity',
                 'Content': 'scheme-content',
                 'Expressive': 'scheme-expressive',
@@ -7322,7 +6823,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateActiveOpacity(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -7365,7 +6866,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateBlurSize(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -7413,7 +6914,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateBlurPass(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -7839,7 +7340,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from hook script)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current rounding value
         function loadCurrentRounding() {
@@ -7893,7 +7394,7 @@ function createCandyUtilsBox() {
     }
     
     // Add rounding input
-    //addRoundingRow('Rounding');
+    addRoundingRow('Rounding');
     
     // --- Hyprland Gaps OUT Control (Translated from Hook Scripts) ---
     function addGapsOutRow(label) {
@@ -7908,7 +7409,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from hook script)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current gaps_out value
         function loadCurrentGapsOut() {
@@ -7974,7 +7475,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from hook script)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current gaps_in value
         function loadCurrentGapsIn() {
@@ -8028,8 +7529,8 @@ function createCandyUtilsBox() {
     }
     
     // Add gaps inputs
-    //addGapsOutRow('Gaps OUT');
-    //addGapsInRow('Gaps IN');
+    addGapsOutRow('Gaps OUT');
+    addGapsInRow('Gaps IN');
     
     // --- Hyprland Border Control (Translated from Hook Scripts) ---
     function addBorderRow(label) {
@@ -8044,7 +7545,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from hook script)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current border_size value
         function loadCurrentBorder() {
@@ -8098,7 +7599,7 @@ function createCandyUtilsBox() {
     }
     
     // Add border input
-    //addBorderRow('Border');
+    addBorderRow('Border');
     
     // --- Blur Size Control (Adapted from existing logic) ---
     function addBlurSizeRow(label) {
@@ -8113,7 +7614,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from existing logic)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current blur size value
         function loadCurrentBlurSize() {
@@ -8178,7 +7679,7 @@ function createCandyUtilsBox() {
     }
     
     // Add blur size input
-    //addBlurSizeRow('Blur Size');
+    addBlurSizeRow('Blur Size');
     
     // --- Blur Pass Control (Adapted from existing logic) ---
     function addBlurPassRow(label) {
@@ -8193,7 +7694,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from existing logic)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current blur pass value
         function loadCurrentBlurPass() {
@@ -8258,7 +7759,7 @@ function createCandyUtilsBox() {
     }
     
     // Add blur pass input
-    //addBlurPassRow('Blur Pass');
+    addBlurPassRow('Blur Pass');
     
     // --- Rofi Border Control (Adapted from existing logic) ---
     function addRofiBorderRow(label) {
@@ -8417,7 +7918,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from existing logic)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current active_opacity value
         function loadCurrentOpacity() {
@@ -8467,7 +7968,7 @@ function createCandyUtilsBox() {
     }
     
     // Add opacity scale input
-    //addOpacityScaleRow('Opacity Scale');
+    addOpacityScaleRow('Opacity Scale');
     
     // --- Waybar Padding Control (Converted to Input Box) ---
     function addWaybarPaddingRow(label) {
@@ -8663,7 +8164,7 @@ function createCandyUtilsBox() {
         lbl.set_size_request(110, -1);
         
         const entry = new Gtk.Entry({ 
-            placeholder_text: '0-255',
+            placeholder_text: '0-180',
             width_chars: 8,
             halign: Gtk.Align.CENTER
         });
@@ -8686,8 +8187,8 @@ function createCandyUtilsBox() {
             
             try {
                 let numValue = parseFloat(value);
-                if (isNaN(numValue) || numValue < 0 || numValue > 255) {
-                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-255" -t 2000`);
+                if (isNaN(numValue) || numValue < 0 || numValue > 180) {
+                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-180" -t 2000`);
                     return;
                 }
                 
@@ -8835,68 +8336,8 @@ function createCandyUtilsBox() {
         rightTogglesBox.append(row);
     }
     
-    // --- Waybar Bottom Margin Control ---
-    function addWaybarBottomMarginRow(label) {
-        const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
-        const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
-        lbl.set_size_request(110, -1);
-        
-        const entry = new Gtk.Entry({ 
-            placeholder_text: '0-20',
-            width_chars: 8,
-            halign: Gtk.Align.CENTER
-        });
-        
-        // Load current value
-        const waybarBottomMarginStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar_bottom_margin.state']);
-        try {
-            let [ok, contents] = GLib.file_get_contents(waybarBottomMarginStateFile);
-            if (ok && contents) {
-                let value = imports.byteArray.toString(contents).trim();
-                entry.set_text(value);
-            }
-        } catch (e) {
-            // Use default value from CSS if state file doesn't exist
-            entry.set_text('0.0');
-        }
-        
-        function updateWaybarBottomMargin(value) {
-            const waybarStyleFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
-            
-            try {
-                let numValue = parseFloat(value);
-                if (isNaN(numValue) || numValue < 0 || numValue > 20) {
-                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-20" -t 2000`);
-                    return;
-                }
-                
-                let valueStr = numValue.toFixed(1);
-                
-                // Update CSS file - margin-bottom
-                GLib.spawn_command_line_async(`sed -i '29s/margin-bottom: [0-9.]*px;/margin-bottom: ${valueStr}px;/' '${waybarStyleFile}'`);
-                
-                // Update state file
-                GLib.file_set_contents(waybarBottomMarginStateFile, valueStr);
-                
-                // Send notification
-                GLib.spawn_command_line_async(`notify-send "Waybar" "Bottom-margin: ${valueStr}px" -t 2000`);
-            } catch (e) {
-                print('Error updating waybar bottom margin: ' + e.message);
-            }
-        }
-        
-        entry.connect('activate', () => {
-            updateWaybarBottomMargin(entry.get_text());
-        });
-        
-        row.append(lbl);
-        row.append(entry);
-        rightTogglesBox.append(row);
-    }
-    
     addWaybarOuterRadiusRow('Waybar Radius');
     addWaybarSideMarginsRow('Waybar Sides');
-    addWaybarBottomMarginRow('Waybar Bottom');
     addWaybarTopMarginRow('Waybar Top');
     
     rightBox.append(rightTogglesBox);
@@ -8916,14 +8357,11 @@ imports.gi.versions.Gtk = '4.0';
 imports.gi.versions.Gio = '2.0';
 imports.gi.versions.GLib = '2.0';
 imports.gi.versions.Gdk = '4.0';
-const { Gtk, Gio, GLib, Gdk } = imports.gi;
+imports.gi.versions.Soup = '3.0';
+imports.gi.versions.GdkPixbuf = '2.0';
+const { Gtk, Gio, GLib, Gdk, Soup, GdkPixbuf } = imports.gi;
 
-const scriptDir = GLib.path_get_dirname(imports.system.programInvocationName);
-imports.searchPath.unshift(scriptDir);
-
-const Weather = imports.weather;
-
-function createCandyUtilsBox() {
+function createTogglesBox() {
     // --- Hyprsunset state persistence setup ---
     const hyprsunsetStateDir = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy']);
     const hyprsunsetStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'hyprsunset.state']);
@@ -8944,20 +8382,8 @@ function createCandyUtilsBox() {
             GLib.file_set_contents(hyprsunsetStateFile, enabled ? 'enabled' : 'disabled');
         } catch (e) {}
     }
-    // Load user GTK color theme CSS (if available)
-    const userColorsProvider = new Gtk.CssProvider();
-    try {
-        userColorsProvider.load_from_path(GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-3.0', 'colors.css']));
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(),
-            userColorsProvider,
-            Gtk.STYLE_PROVIDER_PRIORITY_USER
-        );
-    } catch (e) {
-        // Ignore if not found
-    }
-
-    // Inject custom CSS for gradient background and frame (no neon border)
+    
+        // Inject custom CSS for gradient background and frame (no neon border)
     const cssProvider = new Gtk.CssProvider();
     let css = `
         .candy-utils-frame {
@@ -8979,7 +8405,7 @@ function createCandyUtilsBox() {
         .neon-highlight, button:hover, button:active {
             box-shadow: 0 0 8px 2px @background, 0 0 0 2px @background inset;
             border-color: @source_color;
-            color: @inverse_primary;
+            color: @primary_fixed_dim;
         }
     `;
     cssProvider.load_from_data(css, css.length);
@@ -8989,7 +8415,7 @@ function createCandyUtilsBox() {
         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     );
 
-    // Main horizontal layout: left (hyprsunset, hyprpicker, toggles), right (presets, weather)
+// Main horizontal layout: left (hyprsunset, hyprpicker, toggles), right (presets, weather)
     const mainRow = new Gtk.Box({
         orientation: Gtk.Orientation.HORIZONTAL,
         spacing: 32,
@@ -9012,7 +8438,7 @@ function createCandyUtilsBox() {
     // Hyprsunset controls
     const hyprsunsetBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER });
     let hyprsunsetEnabled = loadHyprsunsetState();
-    const hyprsunsetBtn = new Gtk.Button({ label: hyprsunsetEnabled ? 'Hyprsunset 󰌵' : 'Hyprsunset 󰌶' });
+    const hyprsunsetBtn = new Gtk.Button({ label: hyprsunsetEnabled ? 'Hyprsunset 󰌵' : 'Hyprsunset 󰹏' });
     if (hyprsunsetEnabled) hyprsunsetBtn.add_css_class('neon-highlight');
     hyprsunsetBtn.connect('clicked', () => {
         if (!hyprsunsetEnabled) {
@@ -9022,7 +8448,7 @@ function createCandyUtilsBox() {
             hyprsunsetEnabled = true;
         } else {
             GLib.spawn_command_line_async('pkill hyprsunset');
-            hyprsunsetBtn.set_label('Hyprsunset 󰌶');
+            hyprsunsetBtn.set_label('Hyprsunset 󰹏');
             hyprsunsetBtn.remove_css_class('neon-highlight');
             hyprsunsetEnabled = false;
         }
@@ -9039,14 +8465,14 @@ function createCandyUtilsBox() {
     hyprsunsetBox.append(hyprsunsetBtn);
     hyprsunsetBox.append(gammaDecBtn);
     hyprsunsetBox.append(gammaIncBtn);
-    leftBox.append(hyprsunsetBox);
+    //leftBox.append(hyprsunsetBox);
 
     // Hyprpicker button
     const hyprpickerBtn = new Gtk.Button({ label: 'Launch Hyprpicker' });
     hyprpickerBtn.connect('clicked', () => {
         GLib.spawn_command_line_async('hyprpicker');
     });
-    leftBox.append(hyprpickerBtn);
+    //leftBox.append(hyprpickerBtn);
 
     // --- Xray Toggle Button ---
     const xrayStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'xray.state']);
@@ -9066,7 +8492,7 @@ function createCandyUtilsBox() {
         } catch (e) {}
     }
     function toggleXray(enabled) {
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         const newValue = enabled ? 'true' : 'false';
         GLib.spawn_command_line_async(`sed -i 's/xray = .*/xray = ${newValue}/' "${configFile}"`);
         GLib.spawn_command_line_async('hyprctl reload');
@@ -9087,7 +8513,7 @@ function createCandyUtilsBox() {
         }
         saveXrayState(xrayEnabled);
     });
-    //leftBox.append(xrayBtn);
+    leftBox.append(xrayBtn);
 
     // --- Opacity Toggle Button ---
     const opacityStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'opacity.state']);
@@ -9135,7 +8561,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateActiveOpacity(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -9179,7 +8605,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateBlurSize(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -9227,7 +8653,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateBlurPass(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -9406,81 +8832,21 @@ function createCandyUtilsBox() {
     }
     
     let waybarIslandsEnabled = loadWaybarState();
-    const waybarToggleBtn = new Gtk.Button({ label: waybarIslandsEnabled ? 'Waybar ' : 'Waybar ' });
+    const waybarToggleBtn = new Gtk.Button({ label: waybarIslandsEnabled ? 'Waybar Islands' : 'Waybar Bar' });
     if (waybarIslandsEnabled) waybarToggleBtn.add_css_class('neon-highlight');
     waybarToggleBtn.connect('clicked', () => {
         waybarIslandsEnabled = !waybarIslandsEnabled;
         toggleWaybarMode(waybarIslandsEnabled);
         if (waybarIslandsEnabled) {
-            waybarToggleBtn.set_label('Waybar ');
+            waybarToggleBtn.set_label('Waybar Islands');
             waybarToggleBtn.add_css_class('neon-highlight');
         } else {
-            waybarToggleBtn.set_label('Waybar ');
+            waybarToggleBtn.set_label('Waybar Bar');
             waybarToggleBtn.remove_css_class('neon-highlight');
         }
         saveWaybarState(waybarIslandsEnabled);
     });
     //presetBox.append(waybarToggleBtn);
-    
-    // --- Waybar Bottom|Top Toggle Button ---
-    const waybarConfigFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar-position.txt']);
-    function loadWaybarConfig() {
-        try {
-            let [ok, contents] = GLib.file_get_contents(waybarConfigFile);
-            if (ok && contents) {
-                let config = imports.byteArray.toString(contents).trim();
-                return config === 'bottom';
-            }
-        } catch (e) {}
-        return false; // Default to top position
-    }
-    function saveWaybarConfig(isBottom) {
-        try {
-            GLib.file_set_contents(waybarConfigFile, isBottom ? 'bottom' : 'top');
-        } catch (e) {}
-    }
-    function toggleWaybarSetting(isBottom) {
-        const waybarConfigFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'config.jsonc']);
-        const RofiFile1 = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'rofi', 'bluetooth-menu.rasi']);
-        const RofiFile2 = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'rofi', 'power-menu.rasi']);
-        const RofiFile3 = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'rofi', 'wifi-menu.rasi']);
-        
-        if (isBottom) {
-            // Change to bottom position:
-            GLib.spawn_command_line_async(`sed -i '5s/"position": "top",/"position": "bottom",/' '${waybarConfigFile}'`);
-            // Update rofi menu positions
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 northeast;/location:                 southeast;/' '${RofiFile1}'`);
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 northeast;/location:                 southeast;/' '${RofiFile2}'`);
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 northeast;/location:                 southeast;/' '${RofiFile3}'`);
-        } else {
-            // Change to top position:
-            GLib.spawn_command_line_async(`sed -i '5s/"position": "bottom",/"position": "top",/' '${waybarConfigFile}'`);
-            // Update rofi menu positions
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 southeast;/location:                 northeast;/' '${RofiFile1}'`);
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 southeast;/location:                 northeast;/' '${RofiFile2}'`);
-            GLib.spawn_command_line_async(`sed -i '31s/location:                 southeast;/location:                 northeast;/' '${RofiFile3}'`);
-        }
-        // Reload waybar
-        GLib.spawn_command_line_async('systemctl --user stop waybar.service && sleep 0.3 && pkill -x waybar ');
-        GLib.spawn_command_line_async('systemctl --user restart waybar.service');
-    }
-    
-    let waybarBottomEnabled = loadWaybarConfig();
-    const waybarPositionBtn = new Gtk.Button({ label: waybarBottomEnabled ? 'Waybar ' : 'Waybar ' });
-    if (waybarBottomEnabled) waybarPositionBtn.add_css_class('neon-highlight');
-    waybarPositionBtn.connect('clicked', () => {
-        waybarBottomEnabled = !waybarBottomEnabled;
-        toggleWaybarSetting(waybarBottomEnabled);
-        if (waybarBottomEnabled) {
-            waybarPositionBtn.set_label('Waybar ');
-            waybarPositionBtn.add_css_class('neon-highlight');
-        } else {
-            waybarPositionBtn.set_label('Waybar ');
-            waybarPositionBtn.remove_css_class('neon-highlight');
-        }
-        saveWaybarConfig(waybarBottomEnabled);
-    });
-    //presetBox.append(waybarPositionBtn);
     
     // Add 'New Start Icon' button before Dock presets
     const newStartIconBtn = new Gtk.Button({ label: 'New Start Icon' });
@@ -9505,22 +8871,6 @@ function createCandyUtilsBox() {
         presetBox.append(btn);
     });
     leftBox.append(presetBox);
-
-    // Weather box at the bottom of left box
-    const weatherBox = Weather.createWeatherBoxForEmbed();
-    // Add neon to temp label if possible
-    try {
-        // Find the temp label by class
-        let children = weatherBox.get_children ? weatherBox.get_children() : weatherBox.get_children;
-        if (children && children.length > 0) {
-            for (let child of children) {
-                if (child.get_css_classes && child.get_css_classes().indexOf('weather-temp') !== -1) {
-                    child.add_css_class('weather-temp');
-                }
-            }
-        }
-    } catch (e) {}
-    //leftBox.append(weatherBox);
     
     mainRow.append(leftBox);
     
@@ -9552,35 +8902,30 @@ function createCandyUtilsBox() {
     
     let currentMatugenScheme = loadMatugenState();
     
-        // Matugen scheme buttons
+    // Matugen scheme buttons
     const matugenSchemes = [
-        'Light',
-        'Graphite',
         'Content',
-        'Expressive',
+        'Expressive', 
+        'Fidelity',
+        'Fruit-salad',
+        'Monochrome',
         'Neutral',
         'Rainbow',
-        'Tonal-spot',
-        'Fruit-salad',
+        'Tonal-spot'
     ];
     
     function updateMatugenScheme(schemeName) {
         const waypaperIntegrationFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'hooks', 'waypaper_integration.sh']);
         const gtk3File = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-3.0', 'gtk.css']);
         const gtk4File = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-4.0', 'gtk.css']);
-        const hyprFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
-        const utilsFile = GLib.build_filenamev([GLib.get_home_dir(), '.ultracandy', 'GJS', 'src', 'candy-utils.js']);
-        const waybarFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
-        const dockFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'nwg-dock-hyprland', 'style.css']);
-        const swayncFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'swaync', 'style.css']);
         
         // Convert scheme name to matugen format
         const schemeMap = {
-            'Graphite': 'scheme-monochrome',
-            'Light': 'scheme-fidelity',
             'Content': 'scheme-content',
             'Expressive': 'scheme-expressive',
+            'Fidelity': 'scheme-fidelity',
             'Fruit-salad': 'scheme-fruit-salad',
+            'Monochrome': 'scheme-monochrome',
             'Neutral': 'scheme-neutral',
             'Rainbow': 'scheme-rainbow',
             'Tonal-spot': 'scheme-tonal-spot'
@@ -9593,276 +8938,14 @@ function createCandyUtilsBox() {
         GLib.spawn_command_line_async(`sed -i 's/--type scheme-[^ ]*/--type ${matugenScheme}/' '${waypaperIntegrationFile}'`);
         
         // Handle monochrome vs other schemes for GTK CSS
-        if (schemeName === 'Graphite') {
-            // Replace @on_secondary with @on_primary_fixed_variant for graphite/monochrome
+        if (schemeName === 'Monochrome') {
+            // Replace @on_secondary with @on_primary_fixed_variant for monochrome
             GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_primary_fixed_variant/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_primary_fixed_variant/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
-            GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
-        }
-        
-        if (schemeName === 'Light') {
-            // Replace @on_secondary and @on_primary_fixed_variant with primary_fixed_dim for light/fidelity
-            GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@primary_fixed_dim/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@primary_fixed_dim/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@primary_fixed_dim/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@primary_fixed_dim/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color white/window_fg_color black/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color white/view_fg_color black/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color white/headerbar_fg_color black/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color white/sidebar_fg_color black/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color white/card_fg_color black/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color white/dialog_fg_color black/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: white;/color: black;/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color white/window_fg_color black/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color white/view_fg_color black/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color white/headerbar_fg_color black/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color white/sidebar_fg_color black/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color white/card_fg_color black/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color white/dialog_fg_color black/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: white;/color: black;/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @primary/accent_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @primary/accent_bg_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @on_primary/accent_fg_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @primary/accent_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @primary/accent_bg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @on_primary/accent_fg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $inverse_primary/col.active_border = $primary_fixed_dim/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $inverse_primary,class:/bordercolor $primary_fixed_dim,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 487s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 2355s/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${utilsFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${waybarFile}'`);
-            GLib.spawn_command_line_async(`sed -i '8s/@inverse_primary;/@primary_fixed_dim;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@inverse_primary;/@primary_fixed_dim;/g' '${swayncFile}'`);
-        }
-        
-        if (schemeName === 'Content') {
+        } else {
             // Replace @on_primary_fixed_variant with @on_secondary for other schemes
             GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
-            GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
-        }
-        
-        if (schemeName === 'Expressive') {
-            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
-            GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
-        }
-        
-        if (schemeName === 'Fruit-salad') {
-            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GGLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
-            GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
-        }
-        
-        if (schemeName === 'Neutral') {
-            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
-            GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`); 
-        }
-        
-        if (schemeName === 'Rainbow') {
-            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
-            GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
-        }
-        
-        if (schemeName === 'Tonal-spot') {
-            // Replace @on_primary_fixed_variant with @on_secondary for other schemes
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/@primary_fixed_dim/@on_secondary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/window_fg_color black/window_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/view_fg_color black/view_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/headerbar_fg_color black/headerbar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/sidebar_fg_color black/sidebar_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/card_fg_color black/card_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/dialog_fg_color black/dialog_fg_color white/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i '78s/color: black;/color: white;/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk4File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
-            GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`); 
         }
         
         // Save the new state
@@ -9879,11 +8962,11 @@ function createCandyUtilsBox() {
             const btn = matugenButtons[i];
             const schemeName = matugenSchemes[i];
             const schemeMap = {
-                'Graphite': 'scheme-monochrome',
-                'Light': 'scheme-fidelity',
                 'Content': 'scheme-content',
                 'Expressive': 'scheme-expressive',
+                'Fidelity': 'scheme-fidelity',
                 'Fruit-salad': 'scheme-fruit-salad',
+                'Monochrome': 'scheme-monochrome',
                 'Neutral': 'scheme-neutral',
                 'Rainbow': 'scheme-rainbow',
                 'Tonal-spot': 'scheme-tonal-spot'
@@ -9910,7 +8993,7 @@ function createCandyUtilsBox() {
     // Set initial button states
     updateMatugenButtonStates();
     
-    mainRow.append(themeBox);
+    //mainRow.append(themeBox);
     
     // Right: All toggles
     const rightBox = new Gtk.Box({
@@ -9959,7 +9042,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateActiveOpacity(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -10002,7 +9085,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateBlurSize(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -10050,7 +9133,7 @@ function createCandyUtilsBox() {
         incBtn.set_size_request(32, 32);
         
         function updateBlurPass(increment) {
-            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+            const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
             // Read current value
             try {
                 let [ok, contents] = GLib.file_get_contents(configFile);
@@ -10476,7 +9559,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from hook script)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current rounding value
         function loadCurrentRounding() {
@@ -10530,7 +9613,7 @@ function createCandyUtilsBox() {
     }
     
     // Add rounding input
-    //addRoundingRow('Rounding');
+    addRoundingRow('Rounding');
     
     // --- Hyprland Gaps OUT Control (Translated from Hook Scripts) ---
     function addGapsOutRow(label) {
@@ -10545,7 +9628,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from hook script)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current gaps_out value
         function loadCurrentGapsOut() {
@@ -10611,7 +9694,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from hook script)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current gaps_in value
         function loadCurrentGapsIn() {
@@ -10665,8 +9748,8 @@ function createCandyUtilsBox() {
     }
     
     // Add gaps inputs
-    //addGapsOutRow('Gaps OUT');
-    //addGapsInRow('Gaps IN');
+    addGapsOutRow('Gaps OUT');
+    addGapsInRow('Gaps IN');
     
     // --- Hyprland Border Control (Translated from Hook Scripts) ---
     function addBorderRow(label) {
@@ -10681,7 +9764,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from hook script)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current border_size value
         function loadCurrentBorder() {
@@ -10735,7 +9818,7 @@ function createCandyUtilsBox() {
     }
     
     // Add border input
-    //addBorderRow('Border');
+    addBorderRow('Border');
     
     // --- Blur Size Control (Adapted from existing logic) ---
     function addBlurSizeRow(label) {
@@ -10750,7 +9833,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from existing logic)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current blur size value
         function loadCurrentBlurSize() {
@@ -10815,7 +9898,7 @@ function createCandyUtilsBox() {
     }
     
     // Add blur size input
-    //addBlurSizeRow('Blur Size');
+    addBlurSizeRow('Blur Size');
     
     // --- Blur Pass Control (Adapted from existing logic) ---
     function addBlurPassRow(label) {
@@ -10830,7 +9913,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from existing logic)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current blur pass value
         function loadCurrentBlurPass() {
@@ -10895,7 +9978,7 @@ function createCandyUtilsBox() {
     }
     
     // Add blur pass input
-    //addBlurPassRow('Blur Pass');
+    addBlurPassRow('Blur Pass');
     
     // --- Rofi Border Control (Adapted from existing logic) ---
     function addRofiBorderRow(label) {
@@ -11054,7 +10137,7 @@ function createCandyUtilsBox() {
         });
         
         // File path (from existing logic)
-        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hypr', 'hyprviz.conf']);
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
         
         // Load current active_opacity value
         function loadCurrentOpacity() {
@@ -11104,7 +10187,7 @@ function createCandyUtilsBox() {
     }
     
     // Add opacity scale input
-    //addOpacityScaleRow('Opacity Scale');
+    addOpacityScaleRow('Opacity Scale');
     
     // --- Waybar Padding Control (Converted to Input Box) ---
     function addWaybarPaddingRow(label) {
@@ -11300,7 +10383,7 @@ function createCandyUtilsBox() {
         lbl.set_size_request(110, -1);
         
         const entry = new Gtk.Entry({ 
-            placeholder_text: '0-255',
+            placeholder_text: '0-180',
             width_chars: 8,
             halign: Gtk.Align.CENTER
         });
@@ -11323,8 +10406,8 @@ function createCandyUtilsBox() {
             
             try {
                 let numValue = parseFloat(value);
-                if (isNaN(numValue) || numValue < 0 || numValue > 255) {
-                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-255" -t 2000`);
+                if (isNaN(numValue) || numValue < 0 || numValue > 180) {
+                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-180" -t 2000`);
                     return;
                 }
                 
@@ -11411,129 +10494,8 @@ function createCandyUtilsBox() {
         row.append(entry);
         rightTogglesBox.append(row);
     }
-
-    // --- Waybar Outer Radius Control ---
-    function addWaybarOuterRadiusRow(label) {
-        const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
-        const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
-        lbl.set_size_request(110, -1);
-        
-        const entry = new Gtk.Entry({ 
-            placeholder_text: '0-20',
-            width_chars: 8,
-            halign: Gtk.Align.CENTER
-        });
-        
-        // Load current value
-        const waybarOuterRadiusStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar_outer_radius.state']);
-        try {
-            let [ok, contents] = GLib.file_get_contents(waybarOuterRadiusStateFile);
-            if (ok && contents) {
-                let value = imports.byteArray.toString(contents).trim();
-                entry.set_text(value);
-            }
-        } catch (e) {
-            // Use default value from CSS if state file doesn't exist
-            entry.set_text('20.0');
-        }
-        
-        function updateWaybarOuterRadius(value) {
-            const waybarStyleFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
-            
-            try {
-                let numValue = parseFloat(value);
-                if (isNaN(numValue) || numValue < 0 || numValue > 20) {
-                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-20" -t 2000`);
-                    return;
-                }
-                
-                let valueStr = numValue.toFixed(1);
-                
-                // Update CSS file - border-radius
-                GLib.spawn_command_line_async(`sed -i '30s/border-radius: [0-9.]*px;/border-radius: ${valueStr}px;/' '${waybarStyleFile}'`);
-                GLib.spawn_command_line_async(`sed -i '19s/border-radius: [0-9.]*px;/border-radius: ${valueStr}px;/' '${waybarStyleFile}'`);
-                
-                // Update state file
-                GLib.file_set_contents(waybarOuterRadiusStateFile, valueStr);
-                
-                // Send notification
-                GLib.spawn_command_line_async(`notify-send "Waybar" "Radius: ${valueStr}px" -t 2000`);
-            } catch (e) {
-                print('Error updating waybar outer radius: ' + e.message);
-            }
-        }
-        
-        entry.connect('activate', () => {
-            updateWaybarOuterRadius(entry.get_text());
-        });
-        
-        row.append(lbl);
-        row.append(entry);
-        rightTogglesBox.append(row);
-    }
     
-    // --- Waybar Bottom Margin Control ---
-    function addWaybarBottomMarginRow(label) {
-        const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
-        const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
-        lbl.set_size_request(110, -1);
-        
-        const entry = new Gtk.Entry({ 
-            placeholder_text: '0-20',
-            width_chars: 8,
-            halign: Gtk.Align.CENTER
-        });
-        
-        // Load current value
-        const waybarBottomMarginStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar_bottom_margin.state']);
-        try {
-            let [ok, contents] = GLib.file_get_contents(waybarBottomMarginStateFile);
-            if (ok && contents) {
-                let value = imports.byteArray.toString(contents).trim();
-                entry.set_text(value);
-            }
-        } catch (e) {
-            // Use default value from CSS if state file doesn't exist
-            entry.set_text('0.0');
-        }
-        
-        function updateWaybarBottomMargin(value) {
-            const waybarStyleFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
-            
-            try {
-                let numValue = parseFloat(value);
-                if (isNaN(numValue) || numValue < 0 || numValue > 20) {
-                    GLib.spawn_command_line_async(`notify-send "Waybar" "Invalid value: ${value}. Use 0-20" -t 2000`);
-                    return;
-                }
-                
-                let valueStr = numValue.toFixed(1);
-                
-                // Update CSS file - margin-bottom
-                GLib.spawn_command_line_async(`sed -i '29s/margin-bottom: [0-9.]*px;/margin-bottom: ${valueStr}px;/' '${waybarStyleFile}'`);
-                
-                // Update state file
-                GLib.file_set_contents(waybarBottomMarginStateFile, valueStr);
-                
-                // Send notification
-                GLib.spawn_command_line_async(`notify-send "Waybar" "Bottom-margin: ${valueStr}px" -t 2000`);
-            } catch (e) {
-                print('Error updating waybar bottom margin: ' + e.message);
-            }
-        }
-        
-        entry.connect('activate', () => {
-            updateWaybarBottomMargin(entry.get_text());
-        });
-        
-        row.append(lbl);
-        row.append(entry);
-        rightTogglesBox.append(row);
-    }
-    
-    //addWaybarOuterRadiusRow('Waybar Radius');
     //addWaybarSideMarginsRow('Waybar Sides');
-    //addWaybarBottomMarginRow('Waybar Bottom');
     //addWaybarTopMarginRow('Waybar Top');
     
     rightBox.append(rightTogglesBox);
@@ -11541,8 +10503,9 @@ function createCandyUtilsBox() {
     return mainRow;
 }
 
+// Export both functions
 var exports = {
-    createCandyUtilsBox
+    createTogglesBox
 };
 EOF
 
@@ -11808,13 +10771,13 @@ function createMediaBox() {
     });
     titleLabel.add_css_class('media-title-label');
     const albumArt = new Gtk.Image({
-        pixel_size: 120,
+        pixel_size: 48,
         icon_name: 'media-optical-symbolic',
         halign: Gtk.Align.END,
         valign: Gtk.Align.CENTER,
     });
     albumArt.add_css_class('media-album-art');
-    albumArt.set_size_request(180, 180);
+    albumArt.set_size_request(140, 140);
     albumArt.set_valign(Gtk.Align.FILL);
     albumArt.set_halign(Gtk.Align.CENTER);
     albumArt.set_margin_top(4);
@@ -12516,7 +11479,7 @@ function createMediaBox() {
 
 var exports = {
     createMediaBox
-};
+}; 
 EOF
 
 cat > "$HOME/.ultracandy/GJS/src/weather.js" << 'EOF'
@@ -12971,7 +11934,7 @@ setup_keyboard_layout() {
     done
     
         # Apply the keyboard layout to the custom.conf file
-    CUSTOM_CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+    CUSTOM_CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
     
     if [ -f "$CUSTOM_CONFIG_FILE" ]; then
         sed -i "s/\$LAYOUT/$KEYBOARD_LAYOUT/g" "$CUSTOM_CONFIG_FILE"
@@ -13057,10 +12020,6 @@ main() {
     echo "  • Your choice of shell (Fish or Zsh) with comprehensive configuration"
     echo
     
-    #detect distro
-    detect_distro
-    echo
-
     # Choose display manager first
     choose_display_manager
     echo
@@ -13078,15 +12037,12 @@ main() {
     echo
     
     # Check for AUR helper or install one
-    setup_repos
-    check_or_install_package_manager
+    check_or_install_aur_helper
     
     echo
     print_status "Using $AUR_HELPER as AUR helper"
     
     # Build package list based on display manager and shell choice
-    translate_package_name
-    is_package_available
     build_package_list
     
     # Ask for confirmation
