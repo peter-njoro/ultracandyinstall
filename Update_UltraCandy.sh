@@ -3685,7 +3685,7 @@ input {
 
 general {
     gaps_in = 6
-    gaps_out = 10	
+    gaps_out = 8	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
     col.active_border = $inverse_primary
@@ -3733,7 +3733,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 10
+    rounding = 4
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
@@ -3741,8 +3741,8 @@ decoration {
 
     blur {
     enabled = true
-    size = 12
-    passes = 2
+    size = 2
+    passes = 4
     new_optimizations = on
     ignore_opacity = true
     xray = false
@@ -4362,7 +4362,7 @@ input {
 
 general {
     gaps_in = 6
-    gaps_out = 10	
+    gaps_out = 8	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
     col.active_border = $inverse_primary
@@ -4410,7 +4410,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 10
+    rounding = 4
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
@@ -4418,8 +4418,8 @@ decoration {
 
     blur {
     enabled = true
-    size = 12
-    passes = 2
+    size = 2
+    passes = 4
     new_optimizations = on
     ignore_opacity = true
     xray = false
