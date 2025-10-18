@@ -290,14 +290,13 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
-        "network-manager-applet"
         "blueman"
         "nwg-displays"
         "wlogout"
         "uwsm"
         
         # Application launchers and menus
-        "rofi-wayland"
+        "rofi"
         "rofi-emoji"
         "rofi-nerdy"
         
