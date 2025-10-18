@@ -3665,9 +3665,9 @@ input {
 
 general {
     gaps_in = 6
-    gaps_out = 10	
+    gaps_out = 8	
     gaps_workspaces = 50    # Gaps between workspaces
-    border_size = 3
+    border_size = 2
     col.active_border = $inverse_primary
     col.inactive_border = $scrim
     layout = dwindle
@@ -3713,7 +3713,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 10
+    rounding = 4
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
@@ -3721,8 +3721,8 @@ decoration {
 
     blur {
     enabled = true
-    size = 12
-    passes = 2
+    size = 2
+    passes = 4
     new_optimizations = on
     ignore_opacity = true
     xray = false
@@ -4088,8 +4088,8 @@ plugin {
     hyprexpo {
         #general 
         columns = 3
-        gaps_in = 10
-        gaps_out = 12
+        gaps_in = 8
+        gaps_out = 10
         bg_col = $inverse_primary
         workspace_method = first 1
         
@@ -4338,9 +4338,9 @@ input {
 
 general {
     gaps_in = 6
-    gaps_out = 10	
+    gaps_out = 8	
     gaps_workspaces = 50    # Gaps between workspaces
-    border_size = 3
+    border_size = 2
     col.active_border = $inverse_primary
     col.inactive_border = $scrim
     layout = dwindle
@@ -4386,7 +4386,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 10
+    rounding = 4
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
@@ -4394,8 +4394,8 @@ decoration {
 
     blur {
     enabled = true
-    size = 12
-    passes = 2
+    size = 2
+    passes = 4
     new_optimizations = on
     ignore_opacity = true
     xray = false
@@ -4760,8 +4760,8 @@ plugin {
     hyprexpo {
         #general 
         columns = 3
-        gaps_in = 10
-        gaps_out = 12
+        gaps_in = 8
+        gaps_out = 10
         bg_col = $inverse_primary
         workspace_method = first 1
         
