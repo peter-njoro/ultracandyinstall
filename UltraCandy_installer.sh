@@ -642,7 +642,6 @@ build_package_list() {
         "hyprutils"
         "hyprwayland-scanner"
         "hyprgraphics"
-        "hyprviz-bin"
         
         # GNOME components
         "mutter"
@@ -817,6 +816,7 @@ build_package_list() {
         packages+=(
             "waybar"
             "waypaper-git"
+            "hyprviz-bin"
             "swaync"
         )
         print_status "Added Waybar to package list"
@@ -824,6 +824,7 @@ build_package_list() {
         # Hyprpanel (Arch only)
         packages+=(
             "ags-hyprpanel-git"
+            "hyprviz-bin"
             "mako"
         )
         print_status "Added Hyprpanel to package list"
