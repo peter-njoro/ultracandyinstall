@@ -3687,7 +3687,7 @@ general {
     gaps_in = 6
     gaps_out = 8	
     gaps_workspaces = 50    # Gaps between workspaces
-    border_size = 3
+    border_size = 2
     col.active_border = $inverse_primary
     col.inactive_border = $scrim
     layout = dwindle
@@ -4364,7 +4364,7 @@ general {
     gaps_in = 6
     gaps_out = 8	
     gaps_workspaces = 50    # Gaps between workspaces
-    border_size = 3
+    border_size = 2
     col.active_border = $inverse_primary
     col.inactive_border = $scrim
     layout = dwindle
@@ -4981,7 +4981,7 @@ label {
     monitor =
     #clock
     text = cmd[update:1000] echo "$TIME"
-    color = $source_color
+    color = $inverse_primary
     font_size = 55
     font_family = C059 Bold Italic
     position = 0, -150
