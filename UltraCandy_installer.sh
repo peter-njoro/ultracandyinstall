@@ -669,6 +669,7 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
+        "sddm-sugar-candy-git"
         "power-profiles-daemon"
         "bluez"
         "bluez-utils"
