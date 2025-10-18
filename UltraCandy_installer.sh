@@ -493,60 +493,47 @@ build_package_list() {
 
 # Function to install packages
 install_packages() {
-    print_status "Installing packages using $AUR_HELPER..."
+    print_status "Starting installation of ${#packages[@]} packages using $AUR_HELPER..."
     
+    # Install packages in batches to avoid potential issues
+    local batch_size=10
+    local total=${#packages[@]}
     local installed=0
     local failed=()
-    local skipped=()
+    
+    for ((i=0; i<total; i+=batch_size)); do
+        local batch=("${packages[@]:i:batch_size}")
+        print_status "Installing batch $((i/batch_size + 1)): ${batch[*]}"
         
-        # Try to install all packages at once
-        if $AUR_HELPER -S --needed --noconfirm "${packages[@]}" 2>&1 | tee /tmp/install.log; then
-            print_success "Package installation completed"
-            installed=${#packages[@]}
+        if $AUR_HELPER -S --noconfirm --needed "${batch[@]}"; then
+            installed=$((installed + ${#batch[@]}))
+            print_success "Batch $((i/batch_size + 1)) installed successfully"
         else
-            print_warning "Some packages failed. Installing individually to identify issues..."
-            
-            # Install individually to identify failures
-            for pkg in "${packages[@]}"; do
-                print_status "Installing $pkg..."
-                if $AUR_HELPER -S --needed --noconfirm "$pkg" 2>/dev/null; then
-                    ((installed++))
-                    print_success "$pkg installed"
-                else
+            print_warning "Some packages in batch $((i/batch_size + 1)) failed to install"
+            # Try installing packages individually to identify failures
+            for pkg in "${batch[@]}"; do
+                if ! $AUR_HELPER -S --noconfirm --needed "$pkg"; then
                     failed+=("$pkg")
-                    print_error "Failed to install $pkg"
+                    print_error "Failed to install: $pkg"
+                else
+                    installed=$((installed + 1))
                 fi
             done
         fi
         
-        # Handle notification daemon conflicts for Arch only
-        print_status "Checking for notification daemon conflicts..."
-        if [ "$PANEL_CHOICE" = "waybar" ]; then
-            if pacman -Qi mako >/dev/null 2>&1; then
-                print_status "Removing mako (using SwayNC with Waybar)..."
-                $AUR_HELPER -R --noconfirm mako 2>/dev/null || true 
-            fi
-        else
-            if pacman -Qi swaync >/dev/null 2>&1; then
-                print_status "Removing swaync (using mako with Hyprpanel)..."
-                $AUR_HELPER -R --noconfirm swaync 2>/dev/null || true
-            fi
-        fi
+        # Small delay between batches
+        sleep 2
+    done
     
-    # Summary
-    echo
-    print_success "Installation completed!"
-    print_status "Successfully installed: $installed packages"
-    
-    if [ ${#skipped[@]} -gt 0 ]; then
-        print_warning "Skipped ${#skipped[@]} packages"
-    fi
+    print_status "Installation completed!"
+    print_success "Successfully installed: $installed packages"
     
     if [ ${#failed[@]} -gt 0 ]; then
         print_warning "Failed to install ${#failed[@]} packages:"
-        printf '  - %s\n' "${failed[@]}"
+        printf '%s\n' "${failed[@]}"
         echo
-        print_status "You can try installing failed packages manually later"
+        print_status "You can try installing failed packages manually:"
+        echo "$AUR_HELPER -S ${failed[*]}"
     fi
 }
 
