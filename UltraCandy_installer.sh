@@ -6762,7 +6762,8 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
             GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
             GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`); 
-        }        
+        }
+        
         // Save the new state
         saveMatugenState(matugenScheme);
         currentMatugenScheme = matugenScheme;
@@ -9414,7 +9415,8 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
             GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
             GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`); 
-        }        
+        }
+        
         // Save the new state
         saveMatugenState(matugenScheme);
         currentMatugenScheme = matugenScheme;
