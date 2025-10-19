@@ -933,6 +933,7 @@ setup_ultracandy() {
     print_status "Setting up hyprexpo-plus for workspace overview..."
     
     hyprpm update
+    hyprpm add https://github.com/hyprwm/hyprland-plugins
     hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
     hyprpm update
     hyprpm enable hyprbars
