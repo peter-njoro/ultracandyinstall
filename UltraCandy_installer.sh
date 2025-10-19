@@ -4120,7 +4120,7 @@ plugin {
         color_text = white
         
         hyprbars-button = $on_secondary, 15, , hyprctl dispatch killactive
-        hyprbars-button = $primary_container, 15, , ~/.config/hypr/scripts/hyprbars-minimize.sh
+        hyprbars-button = $primary_container, 15, , bash "$HOME/.config/hypr/scripts/hyprbars-minimize.sh"
         hyprbars-button = $secondary_container, 15, 󰺖, hyprctl dispatch fullscreen 1
         
         on_double_click = hyprctl dispatch fullscreen 1
@@ -4820,7 +4820,7 @@ plugin {
         color_text = white
         
         hyprbars-button = $on_secondary, 15, , hyprctl dispatch killactive
-        hyprbars-button = $primary_container, 15, , ~/.config/hypr/scripts/hyprbars-minimize.sh
+        hyprbars-button = $primary_container, 15, , bash "$HOME/.config/hypr/scripts/hyprbars-minimize.sh"
         hyprbars-button = $secondary_container, 15, 󰺖, hyprctl dispatch fullscreen 1
         
         on_double_click = hyprctl dispatch fullscreen 1
