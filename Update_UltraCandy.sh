@@ -969,10 +969,12 @@ setup_ultracandy() {
         print_status "Ensuring necessary packages are installed"
         echo
         $AUR_HELPER --noconfirm -S waybar waypaper-git swaync hyprviz-bin meson cpio cmake
+        hyprpm enable hyprbars
     else
         print_status "Ensuring necessary packages are installed"
         echo
         $AUR_HELPER --noconfirm -S ags-hyprpanel-git mako hyprviz-bin meson cpio cmake
+        hyprpm enable hyprbars
     fi
 
     print_status "Setting up hyprexpo-plus for wrokspace overview..."
@@ -980,7 +982,6 @@ setup_ultracandy() {
     hyprpm update
     hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
     hyprpm update
-    hyprpm enable hyprbars
     hyprpm enable hyprexpo-plus
     hyprpm disable hyprexpo
     hyprpm reload
