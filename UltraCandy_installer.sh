@@ -930,6 +930,15 @@ EOF
 # Function to automatically setup Hyprcandy configuration
 setup_ultracandy() {
     
+    print_status "Setting up hyprexpo-plus for workspace overview..."
+    hyprpm update
+    hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
+    hyprpm update
+    hyprpm enable hyprbars
+    hyprpm enable hyprexpo-plus
+    hyprpm disable hyprexpo
+    hyprpm reload
+    
     print_status "Setting up UltraCandy configuration..."
     
     # Check if stow is available
@@ -4061,7 +4070,7 @@ plugin {
         gaps_in = 8
         gaps_out = 10
         bg_col = $inverse_primary
-        workspace_method = first 1
+        workspace = first 1
         
         #borders
         border_style = hyprland
@@ -4089,6 +4098,30 @@ plugin {
         label_font_italic = 0
         label_text_underline = 0
         label_text_strikethrough = 0
+    }
+    
+    hyprbars {
+        bar_height = 25
+        bar_color = $inverse_primary
+        bar_blur =true
+        
+        bar_title_enabled = false
+        bar_text_size = 10
+        bar_text_font = FantasqueSansM Nerd Font Propo Regular
+        
+        bar_text_align = center
+        bar_buttons_alignment = left
+        
+        bar_padding = 15
+        bar_button_padding = 6
+        
+        color_text = white
+        
+        hyprbars-button = $on_secondary, 15, , hyprctl dispatch killactive
+        hyprbars-button = $primary_container, 15, , ~/.config/hypr/scripts/hyprbars-minimize.sh
+        hyprbars-button = $secondary_container, 15, 󰺖, hyprctl dispatch fullscreen 1
+        
+        on_double_click = hyprctl dispatch fullscreen 1
     }
 }
 
@@ -4737,7 +4770,7 @@ plugin {
         gaps_in = 8
         gaps_out = 10
         bg_col = $inverse_primary
-        workspace_method = first 1
+        workspace = first 1
         
         #borders
         border_style = hyprland
@@ -4765,6 +4798,30 @@ plugin {
         label_font_italic = 0
         label_text_underline = 0
         label_text_strikethrough = 0
+    }
+    
+    hyprbars {
+        bar_height = 25
+        bar_color = $inverse_primary
+        bar_blur =true
+        
+        bar_title_enabled = false
+        bar_text_size = 10
+        bar_text_font = FantasqueSansM Nerd Font Propo Regular
+        
+        bar_text_align = center
+        bar_buttons_alignment = left
+        
+        bar_padding = 15
+        bar_button_padding = 6
+        
+        color_text = white
+        
+        hyprbars-button = $on_secondary, 15, , hyprctl dispatch killactive
+        hyprbars-button = $primary_container, 15, , ~/.config/hypr/scripts/hyprbars-minimize.sh
+        hyprbars-button = $secondary_container, 15, 󰺖, hyprctl dispatch fullscreen 1
+        
+        on_double_click = hyprctl dispatch fullscreen 1
     }
 }
 
@@ -5426,14 +5483,6 @@ fi
         echo "⚠️  File not found: $HYPRLAND_CUSTOM"
     fi
         fi
-
-    print_status "Setting up hyprexpo-plus for workspace overview..."
-    
-    hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
-    hyprpm update
-    hyprpm enable hyprexpo-plus
-    hyprpm disable hyprexpo
-    hyprpm reload
 }
 
 update_keybinds() {
@@ -5546,8 +5595,6 @@ if [ ! -d "$HOME/.ultracandy/GJS/src" ]; then
     echo "📁 Created the GJS directory"
 fi
 
-# Add GJS files
-if [ "$PANEL_CHOICE" = "waybar" ]; then
 cat > "$HOME/.ultracandy/GJS/candy-main.js" << 'EOF'
 #!/usr/bin/env gjs
 
@@ -5613,76 +5660,6 @@ function main() {
 
 main(); 
 EOF
-
-else
-
-cat > "$HOME/.ultracandy/GJS/toggle-main.js" << 'EOF'
-#!/usr/bin/env gjs
-
-imports.gi.versions.Gtk = '4.0';
-imports.gi.versions.Gdk = '4.0';
-imports.gi.versions.GLib = '2.0';
-const { Gtk, Gdk, GLib } = imports.gi;
-
-const scriptDir = GLib.path_get_dirname(imports.system.programInvocationName);
-imports.searchPath.unshift(scriptDir);
-imports.searchPath.unshift(GLib.build_filenamev([scriptDir, 'src']));
-
-let Adw;
-try {
-    imports.gi.versions.Adw = '1';
-    Adw = imports.gi.Adw;
-} catch (e) {
-    Adw = null;
-}
-
-const Toggle = imports['toggle'];
-
-const APP_ID = 'org.gnome.gjstoggles';
-
-function onActivate(app) {
-    const winToggles = new (Adw ? Adw.ApplicationWindow : Gtk.ApplicationWindow)({
-        application: app,
-        title: 'Toggles',
-        default_width: 400,
-        default_height: 220,
-        resizable: false,
-        decorated: false,
-    });
-    if (winToggles.set_icon_from_file) {
-        try { winToggles.set_icon_from_file(GLib.build_filenamev([GLib.get_home_dir(), '.local/share/icons/HyprCandy.png'])); } catch (e) {}
-    }
-    const togglesBox = Toggle.createTogglesBox();
-    if (Adw && winToggles.set_content) {
-        winToggles.set_content(togglesBox);
-    } else {
-        winToggles.set_child(togglesBox);
-    }
-    // Add Escape key handling
-    const keyController = new Gtk.EventControllerKey();
-    keyController.connect('key-pressed', (controller, keyval, keycode, state) => {
-        if (keyval === Gdk.KEY_Escape) {
-            winToggles.close();
-        }
-        return false;
-    });
-    winToggles.add_controller(keyController);
-    winToggles.set_visible(true);
-    if (winToggles.set_keep_above) winToggles.set_keep_above(true);
-    winToggles.present();
-}
-
-function main() {
-    const ApplicationType = Adw ? Adw.Application : Gtk.Application;
-    const app = new ApplicationType({ application_id: APP_ID });
-    app.connect('activate', onActivate);
-    app.run([]);
-}
-
-main();
-EOF
-
-fi
 
 cat > "$HOME/.ultracandy/GJS/media-main.js" << 'EOF'
 #!/usr/bin/env gjs
@@ -6525,12 +6502,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Light') {
@@ -6559,12 +6538,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @primary/accent_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @primary/accent_bg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @on_primary/accent_fg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $inverse_primary/col.active_border = $primary_fixed_dim/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $inverse_primary,class:/bordercolor $primary_fixed_dim,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 487s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 2355s/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $inverse_primary/col.active_border = $primary_fixed_dim/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $inverse_primary,class:/bordercolor $primary_fixed_dim,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 487s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 2371s/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@inverse_primary;/@primary_fixed_dim;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@inverse_primary;/@primary_fixed_dim;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Content') {
@@ -6593,12 +6574,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Expressive') {
@@ -6629,10 +6612,12 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Fruit-salad') {
@@ -6661,12 +6646,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GGLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GGLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Neutral') {
@@ -6695,12 +6682,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`); 
+            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Rainbow') {
@@ -6729,12 +6718,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Tonal-spot') {
@@ -6763,14 +6754,15 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`); 
-        }
-        
+            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`); 
+        }        
         // Save the new state
         saveMatugenState(matugenScheme);
         currentMatugenScheme = matugenScheme;
@@ -8454,7 +8446,7 @@ EOF
 
 else
 
-cat > "$HOME/.ultracandy/GJS/src/mediaMenu.js" << 'EOF'
+cat > "$HOME/.ultracandy/GJS/src/candy-utils.js" << 'EOF'
 imports.gi.versions.Gtk = '4.0';
 imports.gi.versions.Gio = '2.0';
 imports.gi.versions.GLib = '2.0';
@@ -9162,12 +9154,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Light') {
@@ -9196,12 +9190,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @primary/accent_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @primary/accent_bg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @on_primary/accent_fg_color @primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $inverse_primary/col.active_border = $primary_fixed_dim/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $inverse_primary,class:/bordercolor $primary_fixed_dim,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 487s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 2355s/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $inverse_primary/col.active_border = $primary_fixed_dim/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $inverse_primary,class:/bordercolor $primary_fixed_dim,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 487s/solid @inverse_primary;/solid @primary_fixed_dim;/g; 2371s/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @inverse_primary;/solid @primary_fixed_dim;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@inverse_primary;/@primary_fixed_dim;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@inverse_primary;/@primary_fixed_dim;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Content') {
@@ -9230,12 +9226,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Expressive') {
@@ -9266,10 +9264,12 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Fruit-salad') {
@@ -9298,12 +9298,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GGLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GGLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Neutral') {
@@ -9332,12 +9334,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`); 
+            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Rainbow') {
@@ -9366,12 +9370,14 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
             GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`);
         }
         
         if (schemeName === 'Tonal-spot') {
@@ -9400,14 +9406,15 @@ function createCandyUtilsBox() {
             GLib.spawn_command_line_async(`sed -i 's/accent_color @on_primary/accent_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_bg_color @on_primary/accent_bg_color @primary/g' '${gtk3File}'`);
             GLib.spawn_command_line_async(`sed -i 's/accent_fg_color @primary/accent_fg_color @on_primary/g' '${gtk3File}'`);
-            GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
-            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2355s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/col.active_border = $primary_fixed_dim/col.active_border = $inverse_primary/g' '${hyprFile}'`);
+            //GLib.spawn_command_line_async(`sed -i 's/bordercolor $primary_fixed_dim,class:/bordercolor $inverse_primary,class:/g' '${hyprFile}'`);
+            GLib.spawn_command_line_async(`sed -i '483s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 487s/solid @primary_fixed_dim;/solid @inverse_primary;/g; 2371s/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${utilsFile}'`);
             GLib.spawn_command_line_async(`sed -i 's/solid @primary_fixed_dim;/solid @inverse_primary;/g' '${waybarFile}'`);
             GLib.spawn_command_line_async(`sed -i '8s/@primary_fixed_dim;/@inverse_primary;/g' '${dockFile}'`);
-            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`); 
-        }
-        
+            GLib.spawn_command_line_async(`sed -i '7s/@primary_fixed_dim;/@inverse_primary;/g' '${swayncFile}'`);
+            GLib.spawn_command_line_async(`bash -c '$HOME/.config/nwg-dock-hyprland/launch.sh'`);
+            GLib.spawn_command_line_async(`bash -c 'swaync-client -rs'`); 
+        }        
         // Save the new state
         saveMatugenState(matugenScheme);
         currentMatugenScheme = matugenScheme;
