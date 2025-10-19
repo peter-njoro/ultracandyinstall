@@ -3523,7 +3523,7 @@ exec-once = systemctl --user start background-watcher #Watches for system backgr
 exec-once = systemctl --user start waybar-idle-monitor #Watches bar/panel running status to enable/disable idle-inhibitor
 exec-once = systemctl --user start waypaper-watcher #Watches for system waypaper changes to trigger color generation
 exec-once = systemctl --user start rofi-font-watcher #Watches for system font changes to update rofi-font.rasi
-
+exec-once = systemctl --user start cursor-theme-watcher #Watches for cursor theme changes
 exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
@@ -4224,7 +4224,7 @@ exec-once = systemctl --user start background-watcher #Watches for system backgr
 exec-once = systemctl --user start hyprpanel-idle-monitor #Watches bar/panel running status to enable/disable idle-inhibitor
 #exec-once = systemctl --user start waypaper-watcher #Watches for system waypaper changes to trigger color generation
 exec-once = systemctl --user start rofi-font-watcher #Watches for system font changes to update rofi-font.rasi
-
+exec-once = systemctl --user start cursor-theme-watcher #Watches for cursor theme changes
 exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
