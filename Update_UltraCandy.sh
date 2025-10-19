@@ -3767,9 +3767,9 @@ decoration {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 windowrule = bordercolor $inverse_primary,class:^(.*)
-windowrule = move 73% 50,class:(Candy.SystemMonitor)
-windowrule = move 32% 50,class:(Candy.Media)
-windowrule = move 1% 50,class:(Candy.Weather)
+windowrule = move 73% 75,class:(Candy.SystemMonitor)
+windowrule = move 32% 75,class:(Candy.Media)
+windowrule = move 1% 75,class:(Candy.Weather)
 windowrulev2 = opacity 0.85 0.85,class:^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
 windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
@@ -3867,7 +3867,7 @@ windowrule = center, title:class:(hyprland-share-picker)
 windowrule = size 600 400,class:(hyprland-share-picker)
 # Hyprland Settings App
 windowrule = float,title:(hyprviz)
-windowrule = size 1000 660,title:(hyprviz)
+windowrule = size 1000 625,title:(hyprviz)
 windowrule = center,title:(hyprviz)
 # General floating
 windowrule = float,class:(dotfiles-floating)
@@ -4468,9 +4468,9 @@ decoration {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 windowrule = bordercolor $inverse_primary,class:^(.*)
-windowrule = move 73% 50,class:(Candy.SystemMonitor)
-windowrule = move 32% 50,class:(Candy.Media)
-windowrule = move 1% 50,class:(Candy.Weather)
+windowrule = move 73% 75,class:(Candy.SystemMonitor)
+windowrule = move 32% 75,class:(Candy.Media)
+windowrule = move 1% 75,class:(Candy.Weather)
 windowrulev2 = opacity 0.85 0.85,class:^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
 windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
@@ -4568,7 +4568,7 @@ windowrule = center, title:class:(hyprland-share-picker)
 windowrule = size 600 400,class:(hyprland-share-picker)
 # Hyprland Settings App
 windowrule = float,title:(hyprviz)
-windowrule = size 1000 660,title:(hyprviz)
+windowrule = size 1000 625,title:(hyprviz)
 windowrule = center,title:(hyprviz)
 # General floating
 windowrule = float,class:(dotfiles-floating)
