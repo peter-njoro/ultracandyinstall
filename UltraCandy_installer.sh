@@ -1661,7 +1661,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_status_display.sh"
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_OUT=$((CURRENT_GAPS_OUT + 1))
@@ -1683,7 +1683,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_OUT=$((CURRENT_GAPS_OUT > 0 ? CURRENT_GAPS_OUT - 1 : 0))
@@ -1702,7 +1702,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_IN=$((CURRENT_GAPS_IN + 1))
 sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
@@ -1720,7 +1720,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_IN=$((CURRENT_GAPS_IN > 0 ? CURRENT_GAPS_IN - 1 : 0))
 sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
@@ -1738,7 +1738,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
 NEW_BORDER=$((CURRENT_BORDER + 1))
 sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$NEW_BORDER/" "$CONFIG_FILE"
@@ -1756,7 +1756,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
 NEW_BORDER=$((CURRENT_BORDER > 0 ? CURRENT_BORDER - 1 : 0))
@@ -1776,7 +1776,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
 NEW_ROUNDING=$((CURRENT_ROUNDING + 1))
 sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
@@ -1795,7 +1795,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
 NEW_ROUNDING=$((CURRENT_ROUNDING > 0 ? CURRENT_ROUNDING - 1 : 0))
 sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
@@ -1814,7 +1814,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 case "$1" in
     "minimal")
@@ -1870,7 +1870,7 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
@@ -2105,7 +2105,7 @@ cat > "$HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh" << 'EOF'
 
 GTK3_FILE="$HOME/.config/gtk-3.0/settings.ini"
 GTK4_FILE="$HOME/.config/gtk-4.0/settings.ini"
-HYPRCONF="$HOME/.config/hyprcustom/custom.conf"
+HYPRCONF="$HOME/.config/hypr/hyprviz.conf"
 
 get_value() {
     grep -E "^$1=" "$1" 2>/dev/null | cut -d'=' -f2 | tr -d ' '
@@ -3485,7 +3485,7 @@ EOF
 setup_custom_config() {
 # Create the custom settings directory and files if it doesn't already exist
         if [ ! -d "$HOME/.config/hyprcustom" ]; then
-            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
+            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hypr/hyprviz.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
             echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
           if [ "$PANEL_CHOICE" = "waybar" ]; then
  # Add default content to the custom.conf file
@@ -5416,7 +5416,7 @@ fi
 
     # 🎨 Update Hyprland custom.conf with current username  
     USERNAME=$(whoami)      
-    HYPRLAND_CUSTOM="$HOME/.config/hyprcustom/custom.conf"
+    HYPRLAND_CUSTOM="$HOME/.config/hypr/hyprviz.conf"
     echo "🎨 Updating Hyprland custom.conf with current username..."		
     
     if [ -f "$HYPRLAND_CUSTOM" ]; then
@@ -5476,7 +5476,7 @@ update_keybinds() {
 }
 
 update_custom() {
-    local CUSTOM_CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+    local CUSTOM_CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
     
     # Check if custom config file exists
     if [ ! -f "$CUSTOM_CONFIG_FILE" ]; then
@@ -12514,7 +12514,7 @@ setup_keyboard_layout() {
     done
     
         # Apply the keyboard layout to the custom.conf file
-    CUSTOM_CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+    CUSTOM_CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
     
     if [ -f "$CUSTOM_CONFIG_FILE" ]; then
         sed -i "s/\$LAYOUT/$KEYBOARD_LAYOUT/g" "$CUSTOM_CONFIG_FILE"
