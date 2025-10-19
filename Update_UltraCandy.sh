@@ -3747,7 +3747,7 @@ decoration {
     passes = 4
     new_optimizations = on
     ignore_opacity = true
-    xray = false
+    xray = true
     vibrancy = 0.1696
     noise = 0.01
     popups = true
@@ -4448,7 +4448,7 @@ decoration {
     passes = 4
     new_optimizations = on
     ignore_opacity = true
-    xray = false
+    xray = true
     vibrancy = 0.1696
     noise = 0.01
     popups = true
