@@ -978,6 +978,7 @@ setup_ultracandy() {
     print_status "Setting up hyprexpo-plus for wrokspace overview..."
 
     hyprpm update
+    hyprpam add https://github.com/hyprpm/hyprland-plugins
     hyprpm add https://github.com/sandwichfarm/hyprexpo-plus
     hyprpm update
     hyprpm enable hyprbars
@@ -3401,7 +3402,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/change_start_button_icon.sh"
     # Check if 'gsettings' is available on the system
     if command -v gsettings >/dev/null 2>&1; then
         # Run the command to change the window button layout (e.g., remove minimize/maximize buttons)
-        gsettings set org.gnome.desktop.wm.preferences button-layout ":close" \
+        gsettings set org.gnome.desktop.wm.preferences button-layout "" \
             && echo "✅ GNOME button layout updated." \
             || echo "❌ Failed to update GNOME button layout."
     else
